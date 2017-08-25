@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorGrey25">#dedede</color>
+
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorGrey">#A9A9A9</color>
+    <color name="colorDarkGrey">#737580</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorOrange">#EF7F19</color>
+    <color name="colorBlue">#7aa6fc</color>
+    <color name="colorBackground">#E8EDF2</color>
+
+    <color name="colorTimeTextSelected">#4E8AFC</color>
+    <color name="colorTimeTab">#F4F6F9</color>
+    <color name="colorDateTab">#EAEFF4</color>
+    <color name="colorDateTabSelected">#4E8AFC</color>
+
+    <color name="colorFabButtonBackground">#60A5EC</color>
+    <color name="colorGreen">#65BF69</color>
+    <color name="colorRed">#F34E4E</color>
+    <color name="colorBlue2">#008BFF</color>
+
+
+</resources>

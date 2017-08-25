@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Fabkut Business</string>
+    <string name="logo_catch">Groom Your Self.. !</string>
+    <string name="forgot_password_content">Enter your registered mobile or e-mail id for reset password</string>
+    <string name="openDrawer">open_drawer</string>
+    <string name="closeDrawer">close_drawer</string>
+    <string name="net_price">Net Price(Rupees)</string>
+    <string name="paid_rp">paid(Rupees)</string>
+    <string name="unpaid_rp">Unpaid(Rupees)</string>
+
+    <!-- Toolbar titles when navigation menu item is selected -->
+    <string-array name="nav_item_activity_main_titles">
+        <item>Dashboard</item>
+    </string-array>
+
+    <string-array name="service_name_array">
+        <item>Party Mehndi (951 Rs.) (40 min)</item>
+        <item>Package for Gents (1051 Rs.) (60 min)</item>
+    </string-array>
+
+    <string-array name="mode_payment_array">
+        <item>Cash</item>
+        <item>Debit Card</item>
+        <item>Paytm</item>
+    </string-array>
+
+    <string-array name="employee_array">
+        <item>Marry</item>
+        <item>Arpit</item>
+        <item>Shray</item>
+        <item>Emuvel</item>
+        <item>Shyam</item>
+    </string-array>
+
+
+</resources>
