@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.abhi.fabkutbusiness.R;
-import com.abhi.fabkutbusiness.billing.model.BillingServicesData;
 import com.abhi.fabkutbusiness.billing.view.BillDetailActivity;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfoData;
 
@@ -67,7 +66,7 @@ public class BillingServicesAdapter extends ArrayAdapter<ResponseModelRateInfoDa
             viewHolder.tvRemove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((BillDetailActivity) getContext()).removeService(billingServicesData.getSub_service_name());
+                    ((BillDetailActivity) getContext()).showRemoveServiceDialog(billingServicesData.getSub_service_name());
                 }
             });
 

@@ -19,9 +19,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#E5E5E5"
-                android:padding="@dimen/_8sdp"
+                android:padding="@dimen/_6sdp"
                 android:text="Customer Details"
-                android:textColor="@color/colorBlack" />
+                android:textColor="@color/colorBlack"
+                android:textStyle="bold" />
 
             <View
                 android:layout_width="match_parent"
@@ -84,9 +85,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#E5E5E5"
-                android:padding="@dimen/_8sdp"
+                android:padding="@dimen/_6sdp"
                 android:text="SERVICES"
-                android:textColor="@color/colorBlack" />
+                android:textColor="@color/colorBlack"
+                android:textStyle="bold" />
 
             <com.abhi.fabkutbusiness.Utils.ExpandedListView
                 android:id="@+id/list_services_billing"
@@ -102,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorWhite"
                 android:gravity="center"
-                android:padding="@dimen/_10sdp"
+                android:padding="@dimen/_8sdp"
                 android:text="Add Services"
                 android:textColor="@color/colorBlue"
                 android:textStyle="bold" />
@@ -123,9 +125,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#E5E5E5"
-                android:padding="@dimen/_8sdp"
+                android:padding="@dimen/_6sdp"
                 android:text="PAYMENT SUMMARY"
-                android:textColor="@color/colorBlack" />
+                android:textColor="@color/colorBlack"
+                android:textStyle="bold" />
 
             <View
                 android:layout_width="match_parent"
@@ -152,10 +155,10 @@
                         android:text="Subtotal" />
 
                     <TextView
+                        android:id="@+id/tv_subtotal"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.2"
-                        android:text="Rs. 2351"
                         android:textColor="@color/colorBlack" />
                 </LinearLayout>
 
@@ -172,10 +175,10 @@
                         android:text="Tax" />
 
                     <TextView
+                        android:id="@+id/tv_tax"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.2"
-                        android:text="Rs. 0.00"
                         android:textColor="@color/colorBlack" />
                 </LinearLayout>
 
@@ -184,6 +187,27 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_4sdp"
                     android:padding="@dimen/_2sdp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.8"
+                        android:text="Previous Balance" />
+
+                    <TextView
+                        android:id="@+id/tv_previous_balance"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.2"
+                        android:textColor="@color/colorBlack" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_4sdp"
+                    android:padding="@dimen/_2sdp"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="0dp"
@@ -195,7 +219,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.2"
-                        android:text="Rs. 0.00"
                         android:textColor="@color/colorBlack" />
                 </LinearLayout>
 
@@ -209,14 +232,16 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.8"
-                        android:text="Order Total" />
+                        android:text="Order Total"
+                        android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_order_total"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.2"
-                        android:text="Rs. 2351"
-                        android:textColor="@color/colorBlack" />
+                        android:textColor="@color/colorBlack"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
             </LinearLayout>

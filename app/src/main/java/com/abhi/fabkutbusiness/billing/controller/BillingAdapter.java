@@ -1,9 +1,7 @@
 package com.abhi.fabkutbusiness.billing.controller;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +10,7 @@ import android.widget.TextView;
 
 import com.abhi.fabkutbusiness.R;
 import com.abhi.fabkutbusiness.Utils.Utility;
-import com.abhi.fabkutbusiness.billing.model.BillingData;
 import com.abhi.fabkutbusiness.billing.view.BillDetailActivity;
-import com.abhi.fabkutbusiness.billing.view.BillNowActivity;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointmentsData;
 
 import java.util.ArrayList;
@@ -58,20 +54,16 @@ public class BillingAdapter extends ArrayAdapter<ResponseModelAppointmentsData> 
 
         viewHolder.name.setText("" + billingData.getCustomerEndUser_FirstName() + " " + billingData.getCustomerEndUser_LastName());
         viewHolder.status.setText(" (" + Utility.getBookingTypeText(billingData.getBookingType()) + ") ");
-        viewHolder.time.setText("" + Utility.getFormattedSlotTime(billingData.getSlots()) + " ");
+        viewHolder.time.setText("" + Utility.getFormattedSlotTime(billingData.getSlots(), billingData.getBookingDate()) + " ");
         viewHolder.num.setText("" + billingData.getCustomerMobile() + " ");
 
         viewHolder.billNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-               /* Utility.releaseSeat((Activity) getContext(), billingData.getSeatNumber(), position);
-                Utility.releaseEmployeeSelectedSlots((Activity) getContext(), billingData.getEmployee().getEmp_id(), billingData.getSlots());
-                ((BillNowActivity) context).refreshData();*/
-
-
                 getContext().startActivity(new Intent(getContext(), BillDetailActivity.class)
-                        .putExtra("data", billingData));
+                        .putExtra("data", billingData)
+                        .putExtra("pos", position));
             }
         });
 

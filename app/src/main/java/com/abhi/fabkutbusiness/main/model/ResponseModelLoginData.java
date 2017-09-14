@@ -15,6 +15,8 @@ public class ResponseModelLoginData {
     private String opening_hours;
     private String Closing_hours;
     private String seats;
+    private Double tax_percentage;
+
 
 
     public String getStatus() {
@@ -90,4 +92,16 @@ public class ResponseModelLoginData {
     public void setSeats(String seats) {
         this.seats = seats;
     }
+
+    public Double getTax_percentage() {
+        if (tax_percentage == null)
+            return 18.0;
+        return tax_percentage;
+    }
+
+    public void setTax_percentage(Double tax_percentage) {
+        this.tax_percentage = tax_percentage;
+    }
+
+
 }

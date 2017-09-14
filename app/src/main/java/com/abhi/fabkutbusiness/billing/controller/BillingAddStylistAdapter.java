@@ -1,4 +1,4 @@
-package com.abhi.fabkutbusiness.booking.controller;
+package com.abhi.fabkutbusiness.billing.controller;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
@@ -9,8 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.abhi.fabkutbusiness.R;
-import com.abhi.fabkutbusiness.booking.view.EditBookingServiceActivity;
-import com.abhi.fabkutbusiness.booking.view.BookNowActivity;
 import com.abhi.fabkutbusiness.main.model.ResponseModelEmployeeData;
 import com.squareup.picasso.Picasso;
 
@@ -19,25 +17,20 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class StylistAdapter extends RecyclerView.Adapter<StylistAdapter.MyViewHolder> {
+public class BillingAddStylistAdapter extends RecyclerView.Adapter<BillingAddStylistAdapter.MyViewHolder> {
 
     private List<ResponseModelEmployeeData> employeesDataList;
     private Activity context;
     private int selectedIndex = -1;
     private String selectedEmpId = "-1";
 
-    public ResponseModelEmployeeData getSelectedStylistDataList() {
+    public ResponseModelEmployeeData getSelectedStylist() {
         if (selectedIndex == -1)
             return null;
         else
             return employeesDataList.get(selectedIndex);
     }
 
-    public void setSelectedStylistDataList(ResponseModelEmployeeData employee) {
-
-        selectedEmpId = employee.getEmp_id();
-        notifyDataSetChanged();
-    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvName;
@@ -51,12 +44,11 @@ public class StylistAdapter extends RecyclerView.Adapter<StylistAdapter.MyViewHo
             ivTick = (ImageView) view.findViewById(R.id.iv_stylist_tick);
             tvName = (TextView) view.findViewById(R.id.tv_stylist_name);
             selectedIndex = 0;
-            setDisabledSlotList();
         }
     }
 
 
-    public StylistAdapter(List<ResponseModelEmployeeData> employeesDataList, Activity context) {
+    public BillingAddStylistAdapter(List<ResponseModelEmployeeData> employeesDataList, Activity context) {
         this.employeesDataList = employeesDataList;
         this.context = context;
     }
@@ -94,18 +86,10 @@ public class StylistAdapter extends RecyclerView.Adapter<StylistAdapter.MyViewHo
             public void onClick(View v) {
                 selectedIndex = position;
                 selectedEmpId = employeeData.getEmp_id();
-                setDisabledSlotList();
                 notifyDataSetChanged();
             }
         });
 
-    }
-
-    public void setDisabledSlotList() {
-        if (context instanceof BookNowActivity)
-            ((BookNowActivity) context).setDisabledSlotList(employeesDataList.get(selectedIndex).getBookedSlots());
-        else if (context instanceof EditBookingServiceActivity)
-            ((EditBookingServiceActivity) context).setDisabledSlotList(employeesDataList.get(selectedIndex).getBookedSlots());
     }
 
 

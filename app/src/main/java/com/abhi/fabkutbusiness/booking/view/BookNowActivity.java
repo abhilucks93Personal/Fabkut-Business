@@ -1,12 +1,15 @@
 package com.abhi.fabkutbusiness.booking.view;
 
 import android.app.ActionBar;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -16,10 +19,14 @@ import com.abhi.fabkutbusiness.R;
 import com.abhi.fabkutbusiness.Utils.Constants;
 import com.abhi.fabkutbusiness.Utils.Utility;
 import com.abhi.fabkutbusiness.booking.controller.CustomerDataAdapter;
+import com.abhi.fabkutbusiness.booking.controller.ServicesAdapter;
+import com.abhi.fabkutbusiness.booking.controller.SlotAdapter;
+import com.abhi.fabkutbusiness.booking.controller.StylistAdapter;
 import com.abhi.fabkutbusiness.customer.view.AddCustomerActivity;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointments;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointmentsData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
+import com.abhi.fabkutbusiness.main.model.ResponseModelEmployeeData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfo;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfoData;
 
@@ -29,24 +36,30 @@ import java.util.ArrayList;
  * Created by abhi on 17/04/17.
  */
 
-public class BookNowActivity extends AppCompatActivity implements View.OnClickListener {
+public class BookNowActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     View actionBarView;
     TextView tvTitle;
-    ImageView iconLeft, iconRight;
-    TextView tvAddServices;
+    ImageView iconLeft;
     LinearLayout llMain;
-    TextView tvName, tvEmail, tvGender, tvMobile, tvDesc, tvBookNow;
-    AutoCompleteTextView actSearch;
-    CustomerDataAdapter customerDataAdapter;
+    TextView tvName, tvEmail, tvGender, tvMobile, tvTotalVisits, tvTotalRevenue, tvDesc, tvBookNow;
     ResponseModelAppointmentsData dataAppointment = new ResponseModelAppointmentsData();
-    RelativeLayout rlServiceHeader;
-    LinearLayout llServiceFooter;
-    ImageView ivServiceArrow;
-    LinearLayout llEditServices;
-    TextView tvServicesName, tvServicesPrice, tvServicesDateSlots, tvServicesStylistName, tvEditServices, tvRemoveServices;
-    ImageView ivServicesStylistImage;
-    private String seatNum;
+    String seatNum;
+
+    TextView tvSelectService;
+    TextView tvTime, tvTotal;
+    RecyclerView rvServices, rvStylist, rvSlots;
+    StylistAdapter mAdapterStylist;
+    TextView tvMorning, tvAfternoon, tvEvening;
+    ServicesAdapter mAdapterServices;
+    SlotAdapter mAdapterSlots;
+    ArrayList<ResponseModelRateInfoData> rateInfoDatas;
+    ArrayList<String> slots;
+    int totalTime = 0, totalCost = 0;
+    ArrayList<String> bookedSlots = new ArrayList<>();
+    TextView tvDate;
+    private String currentDate;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,11 +76,28 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
     private void initData() {
 
         seatNum = getIntent().getStringExtra("seatNum");
+        ResponseModelCustomerData responseModelCustomerData = (ResponseModelCustomerData) getIntent().getSerializableExtra("data");
+        setData(responseModelCustomerData);
 
-        ArrayList<ResponseModelCustomerData> data = Utility.getResponseModelCustomer(this, Constants.keySalonCustomerData).getData();
-        customerDataAdapter = new CustomerDataAdapter(this, R.layout.simple_text_view, data);
-        actSearch.setThreshold(1);
-        actSearch.setAdapter(customerDataAdapter);
+        rateInfoDatas = new ArrayList<>();
+        mAdapterServices = new ServicesAdapter(rateInfoDatas, new ArrayList<ResponseModelRateInfoData>(), R.layout.item_selected_service_list, true, this);
+        rvServices.setAdapter(mAdapterServices);
+
+        currentDate = Utility.getCurrentDate(Constants.displayDateFormat);
+        tvDate.setText(currentDate);
+
+        slots = new ArrayList<>();
+        ArrayList<String> selectedSlots = new ArrayList<>();
+
+        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, selectedSlots, bookedSlots, false, currentDate);
+        rvSlots.setAdapter(mAdapterSlots);
+        tvMorning.performClick();
+
+        ArrayList<ResponseModelEmployeeData> employeeDatas = Utility.getResponseModelEmployee(this, Constants.keySalonEmployeeData).getData();
+        mAdapterStylist = new StylistAdapter(employeeDatas, this);
+        rvStylist.setAdapter(mAdapterStylist);
+
+        setServiceTotal(0, 0);
     }
 
     private void findViewById() {
@@ -80,18 +110,6 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         iconLeft.setVisibility(View.VISIBLE);
         iconLeft.setOnClickListener(this);
 
-        iconRight = (ImageView) actionBarView.findViewById(R.id.actionbar_view_icon_right);
-        iconRight.setImageDrawable(getResources().getDrawable(R.drawable.add_customers));
-        iconRight.setVisibility(View.VISIBLE);
-        iconRight.setOnClickListener(this);
-
-        actSearch = (AutoCompleteTextView) findViewById(R.id.act_search);
-
-        tvAddServices = (TextView) findViewById(R.id.tv_add_services);
-        tvAddServices.setOnClickListener(this);
-
-        llEditServices = (LinearLayout) findViewById(R.id.ll_edit_service);
-
         llMain = (LinearLayout) findViewById(R.id.book_now_ll_main);
 
 
@@ -99,25 +117,34 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         tvEmail = (TextView) findViewById(R.id.tv_email);
         tvGender = (TextView) findViewById(R.id.tv_gender);
         tvMobile = (TextView) findViewById(R.id.tv_mobile);
+        tvTotalVisits = (TextView) findViewById(R.id.tv_total_visits);
+        tvTotalRevenue = (TextView) findViewById(R.id.tv_total_revenue);
         tvDesc = (TextView) findViewById(R.id.tv_description);
 
         tvBookNow = (TextView) findViewById(R.id.tv_bookNow);
         tvBookNow.setOnClickListener(this);
 
-        ivServiceArrow = (ImageView) findViewById(R.id.iv_service_arrow);
-        rlServiceHeader = (RelativeLayout) findViewById(R.id.rl_service_header);
-        rlServiceHeader.setOnClickListener(this);
-        llServiceFooter = (LinearLayout) findViewById(R.id.ll_service_footer);
+        tvDate = (TextView) findViewById(R.id.tv_date);
+        tvDate.setOnClickListener(this);
 
-        tvServicesName = (TextView) findViewById(R.id.tv_services_name);
-        tvServicesPrice = (TextView) findViewById(R.id.tv_services_price);
-        tvServicesDateSlots = (TextView) findViewById(R.id.tv_services_date_slot);
-        tvServicesStylistName = (TextView) findViewById(R.id.tv_services_stylist_name);
-        tvEditServices = (TextView) findViewById(R.id.tv_edit_service);
-        tvEditServices.setOnClickListener(this);
-        tvRemoveServices = (TextView) findViewById(R.id.tv_remove_service);
-        tvRemoveServices.setOnClickListener(this);
-        ivServicesStylistImage = (ImageView) findViewById(R.id.iv_services_stylist_image);
+        tvSelectService = (TextView) findViewById(R.id.tv_select_service);
+        tvSelectService.setOnClickListener(this);
+
+
+        tvTime = (TextView) findViewById(R.id.tv_time);
+        tvTotal = (TextView) findViewById(R.id.tv_total);
+        rvServices = (RecyclerView) findViewById(R.id.rv_services);
+        rvServices.setNestedScrollingEnabled(false);
+
+        rvStylist = (RecyclerView) findViewById(R.id.rv_stylist);
+
+        tvMorning = (TextView) findViewById(R.id.tv_morning);
+        tvMorning.setOnClickListener(this);
+        tvAfternoon = (TextView) findViewById(R.id.tv_afternoon);
+        tvAfternoon.setOnClickListener(this);
+        tvEvening = (TextView) findViewById(R.id.tv_evening);
+        tvEvening.setOnClickListener(this);
+        rvSlots = (RecyclerView) findViewById(R.id.rv_slots);
 
     }
 
@@ -138,18 +165,18 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
                 finish();
                 break;
 
-            case R.id.actionbar_view_icon_right:
-                startActivityForResult(new Intent(BookNowActivity.this, AddCustomerActivity.class), 101);
-                break;
-
-            case R.id.tv_add_services:
-                startActivityForResult(new Intent(BookNowActivity.this, AddBookingServiceActivity.class)
-                        .putExtra("data", dataAppointment)
-                        .putExtra("isEdit", false), 102);
-                break;
 
             case R.id.tv_bookNow:
-                if (tvAddServices.getVisibility() != View.VISIBLE) {
+                if (isValidated()) {
+
+                    dataAppointment.setTotalAmount("" + totalCost);
+                    dataAppointment.setTotalTime("" + totalTime);
+                    dataAppointment.setBookingDate(currentDate);
+                    dataAppointment.setBookingTime(mAdapterSlots.getSelectedSlotList().get(0));
+                    dataAppointment.setServices(rateInfoDatas);
+                    dataAppointment.setEmployee(mAdapterStylist.getSelectedStylistDataList());
+                    dataAppointment.setSlots(mAdapterSlots.getSelectedSlotList());
+
                     int seat = Integer.parseInt(seatNum);
 
                     for (ResponseModelRateInfoData rateData : dataAppointment.getServices()) {
@@ -173,51 +200,102 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
                     Utility.setEmployeeSelectedSlots(BookNowActivity.this, dataAppointment.getEmployee().getEmp_id(), dataAppointment.getSlots());
 
                     finish();
-                } else {
-                    Utility.showToast(BookNowActivity.this, "Please add services.");
                 }
 
                 break;
 
-            case R.id.rl_service_header:
-
-                if (llServiceFooter.getVisibility() == View.VISIBLE) {
-                    ivServiceArrow.setImageDrawable(getResources().getDrawable(R.drawable.ser_close));
-                    llServiceFooter.setVisibility(View.GONE);
-                } else {
-                    ivServiceArrow.setImageDrawable(getResources().getDrawable(R.drawable.ser_open));
-                    llServiceFooter.setVisibility(View.VISIBLE);
-                }
-
+            case R.id.tv_select_service:
+                startActivityForResult(new Intent(BookNowActivity.this, SelectServiceActivity.class)
+                        .putExtra("data", rateInfoDatas), 101);
                 break;
 
-
-            case R.id.tv_remove_service:
-
-                dataAppointment.setTotalAmount("" + 0);
-                dataAppointment.setTotalTime("" + 0);
-                //  dataAppointment.setBookingDate();
-                dataAppointment.setServices(new ArrayList<ResponseModelRateInfoData>());
-                dataAppointment.setEmployee(null);
-                dataAppointment.setSlots(new ArrayList<String>());
-
-                tvAddServices.setVisibility(View.VISIBLE);
-                llEditServices.setVisibility(View.GONE);
-
-                tvServicesName.setText("");
-                tvServicesPrice.setText("");
-                tvServicesStylistName.setText("");
-                tvServicesDateSlots.setText("");
-
+            case R.id.tv_morning:
+                setSlot(0);
                 break;
 
-            case R.id.tv_edit_service:
-                startActivityForResult(new Intent(BookNowActivity.this, AddBookingServiceActivity.class)
-                        .putExtra("data", dataAppointment)
-                        .putExtra("isEdit", true), 102);
+            case R.id.tv_afternoon:
+                setSlot(1);
+                break;
+
+            case R.id.tv_evening:
+                setSlot(2);
+                break;
+
+            case R.id.tv_date:
+                Utility.datePickerDialog(BookNowActivity.this, this);
                 break;
 
         }
+    }
+
+    private boolean isValidated() {
+
+        if (rateInfoDatas == null) {
+            Utility.showToast(BookNowActivity.this, "Please select services");
+            return false;
+        }
+
+        if (rateInfoDatas.size() == 0) {
+            Utility.showToast(BookNowActivity.this, "Please select services");
+            return false;
+        }
+
+        if (mAdapterStylist.getSelectedStylistDataList() == null) {
+            Utility.showToast(BookNowActivity.this, "Please select a Stylist");
+            return false;
+        }
+
+
+        if (mAdapterSlots.getSelectedSlotList() == null) {
+            Utility.showToast(BookNowActivity.this, "Please select Time Slots");
+            return false;
+        }
+
+        if (mAdapterSlots.getSelectedSlotList().size() == 0) {
+            Utility.showToast(BookNowActivity.this, "Please select Time Slots");
+            return false;
+        }
+
+        return true;
+    }
+
+
+    private void setSlot(int slot) {
+        slots.clear();
+
+        switch (slot) {
+
+            case 0:
+                // Morning Slot
+                tvMorning.setTextColor(getResources().getColor(R.color.colorBlue2));
+                tvAfternoon.setTextColor(getResources().getColor(R.color.colorBlack));
+                tvEvening.setTextColor(getResources().getColor(R.color.colorBlack));
+                String openTime = Utility.getPreferences(BookNowActivity.this, Constants.keySalonOpenTime);
+                slots.addAll(Utility.getTimeSlots(openTime, Constants.timeStartAfternoon));
+                mAdapterSlots.notifyDataSetChanged();
+                break;
+
+            case 1:
+                // Afternoon Slot
+                tvMorning.setTextColor(getResources().getColor(R.color.colorBlack));
+                tvAfternoon.setTextColor(getResources().getColor(R.color.colorBlue2));
+                tvEvening.setTextColor(getResources().getColor(R.color.colorBlack));
+                slots.addAll(Utility.getTimeSlots(Constants.timeStartAfternoon, Constants.timeEndAfternoon));
+                mAdapterSlots.notifyDataSetChanged();
+                break;
+
+            case 2:
+                // Evening Slot
+                tvMorning.setTextColor(getResources().getColor(R.color.colorBlack));
+                tvAfternoon.setTextColor(getResources().getColor(R.color.colorBlack));
+                tvEvening.setTextColor(getResources().getColor(R.color.colorBlue2));
+                String closeTime = Utility.getPreferences(BookNowActivity.this, Constants.keySalonCloseTime);
+                slots.addAll(Utility.getTimeSlots(Constants.timeEndAfternoon, closeTime));
+                mAdapterSlots.notifyDataSetChanged();
+                break;
+
+        }
+
     }
 
 
@@ -228,54 +306,57 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         switch (requestCode) {
 
             case 101:
+
                 if (resultCode == RESULT_OK) {
 
-                    ResponseModelCustomerData responseModelCustomerData = (ResponseModelCustomerData) data.getSerializableExtra("data");
-
-                    setData(responseModelCustomerData);
+                    ArrayList<ResponseModelRateInfoData> rateInfoDatas = data.getParcelableArrayListExtra("dataList");
+                    if (rateInfoDatas.size() == 0)
+                        setServiceTotal(0, 0);
+                    this.rateInfoDatas.clear();
+                    this.rateInfoDatas.addAll(rateInfoDatas);
+                    mAdapterServices.notifyDataSetChanged();
                 }
+
                 break;
 
-            case 102:
-                if (resultCode == RESULT_OK) {
 
-                    dataAppointment = data.getParcelableExtra("data");
-                    setServicesData();
-                }
-                break;
         }
     }
 
-    private void setServicesData() {
-        tvAddServices.setVisibility(View.GONE);
-        llEditServices.setVisibility(View.VISIBLE);
-
-        tvServicesName.setText(Utility.getFormattedServiceList(dataAppointment.getServices()));
-        tvServicesPrice.setText("Price : " + dataAppointment.getTotalAmount() + "");
-        tvServicesStylistName.setText(dataAppointment.getEmployee().getEmp_name());
-        tvServicesDateSlots.setText(dataAppointment.getSlots().get(0));
-
+    public void setServiceTotal(int totalCost, int totalTime) {
+        this.totalTime = totalTime;
+        this.totalCost = totalCost;
+        tvTime.setText("Time : " + totalTime + "min");
+        tvTotal.setText("Total : " + totalCost + "Rs.");
+        mAdapterSlots.setSlotSelection(getSelectedSlotCount(totalTime));
     }
+
+    private int getSelectedSlotCount(int totalTime) {
+        int count = 0;
+
+        if (totalTime != 0)
+            count = (int) Math.ceil(totalTime / Constants.slotDifference);
+
+        return count;
+    }
+
 
     public void setData(ResponseModelCustomerData responseModelCustomerData) {
         llMain.setVisibility(View.VISIBLE);
 
-        tvAddServices.setVisibility(View.VISIBLE);
-        llEditServices.setVisibility(View.GONE);
-
-        actSearch.setText("");
-        actSearch.clearFocus();
-        Utility.hideKeyboard(BookNowActivity.this);
 
         tvName.setText(responseModelCustomerData.getEndUser_FirstName() + " " + responseModelCustomerData.getEndUser_LastName());
         tvMobile.setText(responseModelCustomerData.getContact_no());
         tvEmail.setText(responseModelCustomerData.getEmail());
         tvGender.setText(responseModelCustomerData.getGender());
+        tvTotalVisits.setText("" + Utility.getTotalVisits(this, responseModelCustomerData.getCustomerId()) + "");
+        tvTotalRevenue.setText("" + Utility.getTotalRevenue(this, responseModelCustomerData.getCustomerId()) + "");
         if (responseModelCustomerData.getAllergies().length() > 0) {
-            tvDesc.setText("Allergic to :\n" + responseModelCustomerData.getAllergies());
+            tvDesc.setText("Allergic to :\n" + responseModelCustomerData.getAllergies() + "");
         }
 
         dataAppointment = new ResponseModelAppointmentsData();
+        dataAppointment.setCustomerId(responseModelCustomerData.getCustomerId());
         dataAppointment.setBookingId(System.currentTimeMillis());
         dataAppointment.setCustomerEndUser_FirstName(responseModelCustomerData.getEndUser_FirstName());
         dataAppointment.setCustomerEndUser_LastName(responseModelCustomerData.getEndUser_LastName());
@@ -284,5 +365,22 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         dataAppointment.setCustomerMobile(responseModelCustomerData.getContact_no());
         dataAppointment.setSeatNumber(seatNum);
 
+    }
+
+    public void setDisabledSlotList(ArrayList<String> bookedSlots) {
+        this.bookedSlots.clear();
+        this.bookedSlots.addAll(bookedSlots);
+        mAdapterSlots.setDisabledSlotList(bookedSlots);
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        String date = "0" + (view.getMonth() + 1)
+                + "-" + view.getDayOfMonth()
+                + "-" + view.getYear();
+
+        currentDate = Utility.formatDateForDisplay(date, "MM-dd-yyyy", Constants.displayDateFormat);
+        tvDate.setText(currentDate);
+        mAdapterSlots.setDate(currentDate);
     }
 }

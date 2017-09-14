@@ -3,6 +3,7 @@
     package="com.abhi.fabkutbusiness">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name="com.abhi.fabkutbusiness.app.App"
@@ -39,7 +40,7 @@
             android:name=".main.NavigationMainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+            android:windowSoftInputMode="stateHidden" />
 
 
         <!-- _________________________________Tag_Booking_________________________________ -->
@@ -51,7 +52,7 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
-            android:name=".booking.view.AddBookingServiceActivity"
+            android:name=".booking.view.EditBookingServiceActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
@@ -96,6 +97,10 @@
             android:name=".accounting.view.AccountingActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".billing.view.InvoiceActivity"
+            android:screenOrientation="portrait" />
 
 
     </application>

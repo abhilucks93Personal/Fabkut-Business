@@ -26,7 +26,7 @@ import java.util.ArrayList;
  * Created by abhi on 17/04/17.
  */
 
-public class AddBookingServiceActivity extends AppCompatActivity implements View.OnClickListener {
+public class EditBookingServiceActivity extends AppCompatActivity implements View.OnClickListener {
 
     View actionBarView;
     TextView tvTitle;
@@ -44,12 +44,13 @@ public class AddBookingServiceActivity extends AppCompatActivity implements View
     ResponseModelAppointmentsData data = new ResponseModelAppointmentsData();
     boolean isEdit;
     private ArrayList<String> bookedSlots = new ArrayList<>();
+    private String bookingDate;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_booking_add_services);
+        setContentView(R.layout.activity_add_service_booking);
 
         setActionBarView();
         findViewById();
@@ -86,12 +87,14 @@ public class AddBookingServiceActivity extends AppCompatActivity implements View
         rateInfoDatas = new ArrayList<>();
         mAdapterServices = new ServicesAdapter(rateInfoDatas, new ArrayList<ResponseModelRateInfoData>(), R.layout.item_selected_service_list, true, this);
         rvServices.setAdapter(mAdapterServices);
-
+        bookingDate = Utility.getCurrentDate(Constants.displayDateFormat);
         slots = new ArrayList<>();
         ArrayList<String> selectedSlots = new ArrayList<>();
-        if (isEdit)
+        if (isEdit) {
             selectedSlots.addAll(data.getSlots());
-        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, selectedSlots, bookedSlots, isEdit);
+            bookingDate = data.getBookingDate();
+        }
+        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, selectedSlots, bookedSlots, isEdit, bookingDate);
         rvSlots.setAdapter(mAdapterSlots);
         tvMorning.performClick();
 
@@ -109,7 +112,7 @@ public class AddBookingServiceActivity extends AppCompatActivity implements View
     private void findViewById() {
 
         tvTitle = (TextView) actionBarView.findViewById(R.id.actionbar_view_title);
-        tvTitle.setText("Add Services");
+        tvTitle.setText("Edit Services");
 
         iconLeft = (ImageView) actionBarView.findViewById(R.id.actionbar_view_icon_left);
         iconLeft.setImageDrawable(getResources().getDrawable(R.drawable.rectangle4));
@@ -174,7 +177,7 @@ public class AddBookingServiceActivity extends AppCompatActivity implements View
                 break;
 
             case R.id.tv_select_service:
-                startActivityForResult(new Intent(AddBookingServiceActivity.this, SelectServiceActivity.class)
+                startActivityForResult(new Intent(EditBookingServiceActivity.this, SelectServiceActivity.class)
                         .putExtra("data", rateInfoDatas), 101);
                 break;
 
@@ -216,28 +219,28 @@ public class AddBookingServiceActivity extends AppCompatActivity implements View
     private boolean isValidated() {
 
         if (rateInfoDatas == null) {
-            Utility.showToast(AddBookingServiceActivity.this, "Please select services");
+            Utility.showToast(EditBookingServiceActivity.this, "Please select services");
             return false;
         }
 
         if (rateInfoDatas.size() == 0) {
-            Utility.showToast(AddBookingServiceActivity.this, "Please select services");
+            Utility.showToast(EditBookingServiceActivity.this, "Please select services");
             return false;
         }
 
         if (mAdapterStylist.getSelectedStylistDataList() == null) {
-            Utility.showToast(AddBookingServiceActivity.this, "Please select a Stylist");
+            Utility.showToast(EditBookingServiceActivity.this, "Please select a Stylist");
             return false;
         }
 
 
         if (mAdapterSlots.getSelectedSlotList() == null) {
-            Utility.showToast(AddBookingServiceActivity.this, "Please select Time Slots");
+            Utility.showToast(EditBookingServiceActivity.this, "Please select Time Slots");
             return false;
         }
 
         if (mAdapterSlots.getSelectedSlotList().size() == 0) {
-            Utility.showToast(AddBookingServiceActivity.this, "Please select Time Slots");
+            Utility.showToast(EditBookingServiceActivity.this, "Please select Time Slots");
             return false;
         }
 
@@ -254,7 +257,7 @@ public class AddBookingServiceActivity extends AppCompatActivity implements View
                 tvMorning.setTextColor(getResources().getColor(R.color.colorBlue2));
                 tvAfternoon.setTextColor(getResources().getColor(R.color.colorBlack));
                 tvEvening.setTextColor(getResources().getColor(R.color.colorBlack));
-                String openTime = Utility.getPreferences(AddBookingServiceActivity.this, Constants.keySalonOpenTime);
+                String openTime = Utility.getPreferences(EditBookingServiceActivity.this, Constants.keySalonOpenTime);
                 slots.addAll(Utility.getTimeSlots(openTime, Constants.timeStartAfternoon));
                 mAdapterSlots.notifyDataSetChanged();
                 break;
@@ -273,7 +276,7 @@ public class AddBookingServiceActivity extends AppCompatActivity implements View
                 tvMorning.setTextColor(getResources().getColor(R.color.colorBlack));
                 tvAfternoon.setTextColor(getResources().getColor(R.color.colorBlack));
                 tvEvening.setTextColor(getResources().getColor(R.color.colorBlue2));
-                String closeTime = Utility.getPreferences(AddBookingServiceActivity.this, Constants.keySalonCloseTime);
+                String closeTime = Utility.getPreferences(EditBookingServiceActivity.this, Constants.keySalonCloseTime);
                 slots.addAll(Utility.getTimeSlots(Constants.timeEndAfternoon, closeTime));
                 mAdapterSlots.notifyDataSetChanged();
                 break;

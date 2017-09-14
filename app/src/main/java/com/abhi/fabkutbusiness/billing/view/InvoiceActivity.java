@@ -4,70 +4,64 @@ import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.abhi.fabkutbusiness.R;
-import com.abhi.fabkutbusiness.Utils.Constants;
 import com.abhi.fabkutbusiness.Utils.Utility;
-import com.abhi.fabkutbusiness.billing.controller.BillingAdapter;
+import com.abhi.fabkutbusiness.billing.controller.InvoiceServicesAdapter;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointmentsData;
-
-import java.util.ArrayList;
 
 /**
  * Created by abhi on 17/04/17.
  */
 
-public class BillNowActivity extends AppCompatActivity implements View.OnClickListener {
+public class InvoiceActivity extends AppCompatActivity implements View.OnClickListener {
 
     View actionBarView;
     TextView tvTitle;
-    ImageView iconLeft;
-    EditText etSearch;
-    ListView listBilling;
-    ArrayList<ResponseModelAppointmentsData> billingData = new ArrayList<>();
-    private BillingAdapter adapter;
+    ImageView iconLeft, iconRight;
+    RecyclerView listServices;
+    InvoiceServicesAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_bill_now);
+        setContentView(R.layout.activity_invoice);
 
         setActionBarView();
         findViewById();
         initData();
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        refreshData();
     }
 
     private void initData() {
-        adapter = new BillingAdapter(BillNowActivity.this, billingData);
-        listBilling.setAdapter(adapter);
+
+        ResponseModelAppointmentsData data = getIntent().getParcelableExtra("data");
+
+        adapter = new InvoiceServicesAdapter(data.getServices(), R.layout.item_services_invoice);
+        listServices.setAdapter(adapter);
     }
 
     private void findViewById() {
 
         tvTitle = (TextView) actionBarView.findViewById(R.id.actionbar_view_title);
-        tvTitle.setText("Billing");
+        tvTitle.setText("Invoice");
 
         iconLeft = (ImageView) actionBarView.findViewById(R.id.actionbar_view_icon_left);
         iconLeft.setImageDrawable(getResources().getDrawable(R.drawable.rectangle4));
         iconLeft.setVisibility(View.VISIBLE);
         iconLeft.setOnClickListener(this);
 
-        etSearch = (EditText) findViewById(R.id.et_search);
-        listBilling = (ListView) findViewById(R.id.list_billing);
+        iconRight = (ImageView) actionBarView.findViewById(R.id.actionbar_view_icon_right);
+        iconRight.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_menu_save));
+        iconRight.setVisibility(View.VISIBLE);
+        iconRight.setOnClickListener(this);
+
+        listServices = (RecyclerView) findViewById(R.id.rv_invoice_services);
+        listServices.setNestedScrollingEnabled(false);
 
     }
 
@@ -79,6 +73,7 @@ public class BillNowActivity extends AppCompatActivity implements View.OnClickLi
         actionBarView = getSupportActionBar().getCustomView();
     }
 
+
     @Override
     public void onClick(View v) {
 
@@ -87,17 +82,16 @@ public class BillNowActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.actionbar_view_icon_left:
                 finish();
                 break;
+
+            case R.id.actionbar_view_icon_right:
+                saveInvoice();
+                break;
         }
     }
 
-    public void refreshData() {
-        billingData.clear();
-        billingData.addAll(Utility.getResponseModelBookings(BillNowActivity.this, Constants.keySalonBookingData).getData());
-        if (billingData.size() > 0)
-            adapter.notifyDataSetChanged();
-        else {
-            //Utility.showToast(this, "No Billing available");
-            finish();
-        }
+    private void saveInvoice() {
+        Utility.showToast(this, "Invoice saved");
     }
+
+
 }

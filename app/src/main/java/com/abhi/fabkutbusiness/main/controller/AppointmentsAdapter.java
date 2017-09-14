@@ -70,12 +70,17 @@ public class AppointmentsAdapter extends ArrayAdapter<ResponseModelAppointmentsD
         }
 
         final ResponseModelAppointmentsData appointmentsData = getItem(position);
+
         viewHolder.name.setText("" + appointmentsData.getCustomerEndUser_FirstName() + " " + appointmentsData.getCustomerEndUser_LastName());
+
         viewHolder.status.setText(" (" + Utility.getBookingTypeText(appointmentsData.getBookingType()) + ") ");
+
         if (appointmentsData.getServices() != null)
-        viewHolder.description.setText(Utility.getFormattedServiceList(appointmentsData.getServices()));
+            viewHolder.description.setText(Utility.getFormattedServiceList(appointmentsData.getServices()));
+
         if (appointmentsData.getSlots() != null)
-            viewHolder.time.setText("" + Utility.getFormattedSlotTime(appointmentsData.getSlots()) + " ");
+            viewHolder.time.setText("" + Utility.getFormattedSlotTime(appointmentsData.getSlots(), appointmentsData.getBookingDate()) + " ");
+
         viewHolder.num.setText("" + appointmentsData.getCustomerMobile() + " ");
 
 

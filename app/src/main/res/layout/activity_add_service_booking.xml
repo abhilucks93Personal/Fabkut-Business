@@ -247,7 +247,7 @@
         android:background="@color/colorGreen"
         android:gravity="center"
         android:padding="@dimen/_12sdp"
-        android:text="Booking"
+        android:text="Submit"
         android:textColor="@color/colorWhite"
         android:textSize="@dimen/_14sdp"
         android:textStyle="bold" />

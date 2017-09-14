@@ -15,7 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -27,12 +27,13 @@ import com.abhi.fabkutbusiness.Utils.Constants;
 import com.abhi.fabkutbusiness.Utils.Utility;
 import com.abhi.fabkutbusiness.accounting.view.AccountingActivity;
 import com.abhi.fabkutbusiness.billing.view.BillNowActivity;
-import com.abhi.fabkutbusiness.booking.view.AddBookingServiceActivity;
-import com.abhi.fabkutbusiness.booking.view.BookNowActivity;
+import com.abhi.fabkutbusiness.booking.controller.CustomerDataAdapter;
+import com.abhi.fabkutbusiness.booking.view.EditBookingServiceActivity;
 import com.abhi.fabkutbusiness.customer.view.AddCustomerActivity;
 import com.abhi.fabkutbusiness.main.controller.AppointmentsAdapter;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointments;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointmentsData;
+import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
 
 import java.util.ArrayList;
 
@@ -47,7 +48,6 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
     Toolbar toolbar;
     FloatingActionButton fab;
     ImageView ivAppointments;
-    EditText etSearch;
     ListView listAppointments;
     ArrayList<ResponseModelAppointmentsData> appointmentsData = new ArrayList<>();
     TextView tvAccounting, tvInventory;
@@ -55,6 +55,9 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
     private ArrayList<ImageView> seatImageViews;
     private LinearLayout llSeats;
     private int reschedulePos = -1;
+    AutoCompleteTextView actSearch;
+    CustomerDataAdapter customerDataAdapter;
+    private ArrayList<ResponseModelCustomerData> data;
 
     @Override
     protected void onResume() {
@@ -65,6 +68,8 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
         seatImageViews = Utility.refreshSeats(this, llSeats, seatImageViews);
 
+        data.addAll(Utility.getResponseModelCustomer(this, Constants.keySalonCustomerData).getData());
+        customerDataAdapter.notifyDataSetChanged();
     }
 
 
@@ -112,11 +117,17 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
         adapter = new AppointmentsAdapter(NavigationMainActivity.this, appointmentsData);
         listAppointments.setAdapter(adapter);
+
+        data = Utility.getResponseModelCustomer(this, Constants.keySalonCustomerData).getData();
+        customerDataAdapter = new CustomerDataAdapter(this, R.layout.simple_text_view, data);
+        actSearch.setThreshold(1);
+        actSearch.setAdapter(customerDataAdapter);
+        actSearch.setText("");
+        actSearch.clearFocus();
     }
 
     private void findViewById() {
-        etSearch = (EditText) findViewById(R.id.et_search);
-        etSearch.setOnClickListener(this);
+
 
         tvAccounting = (TextView) findViewById(R.id.tv_accounting);
         tvAccounting.setOnClickListener(this);
@@ -127,6 +138,8 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
         tvInventory.setOnClickListener(this);
 
         llSeats = (LinearLayout) findViewById(R.id.ll_seats);
+
+        actSearch = (AutoCompleteTextView) findViewById(R.id.act_search);
     }
 
     private void initToolbar() {
@@ -298,20 +311,20 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
-                startActivity(new Intent(NavigationMainActivity.this, BillNowActivity.class));
+
+                ArrayList<ResponseModelAppointmentsData> billingData = Utility.getResponseModelBookings(NavigationMainActivity.this, Constants.keySalonBookingData).getData();
+                if (billingData.size() > 0)
+                    startActivity(new Intent(NavigationMainActivity.this, BillNowActivity.class));
+                else
+                    Utility.showToast(this, "No Billing available");
+
+
                 break;
 
             case R.id.app_bar_iv_appointments:
                 startActivity(new Intent(NavigationMainActivity.this, AddCustomerActivity.class));
                 break;
 
-            case R.id.et_search:
-
-                String seatNum = Utility.getEmptySeatNum(NavigationMainActivity.this);
-
-                startActivity(new Intent(NavigationMainActivity.this, BookNowActivity.class)
-                        .putExtra("seatNum", seatNum));
-                break;
 
             case R.id.tv_accounting:
                 startActivity(new Intent(NavigationMainActivity.this, AccountingActivity.class));
@@ -396,7 +409,7 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
             ResponseModelAppointmentsData _dataAppointment = responseModelAppointments.getData().get(position);
 
-            startActivityForResult(new Intent(NavigationMainActivity.this, AddBookingServiceActivity.class)
+            startActivityForResult(new Intent(NavigationMainActivity.this, EditBookingServiceActivity.class)
                     .putExtra("data", _dataAppointment)
                     .putExtra("isEdit", true), 201);
 

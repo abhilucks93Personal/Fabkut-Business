@@ -59,6 +59,10 @@ public class ResponseModelRateInfoData implements Parcelable {
     }
 
     public String getRate() {
+        if (rate == null)
+            return "0";
+        if (rate.equals(""))
+            return "0";
         return rate;
     }
 

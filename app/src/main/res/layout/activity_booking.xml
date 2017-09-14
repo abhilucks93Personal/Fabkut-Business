@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:background="@color/colorWhite">
 
-            <EditText
+          <!--  <EditText
                 android:id="@+id/et_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -38,7 +38,20 @@
                 android:hint="Search"
                 android:padding="@dimen/_5sdp"
                 android:textColorHint="@color/colorGrey"
+                android:textSize="@dimen/_10sdp" />-->
+
+            <AutoCompleteTextView
+                android:id="@+id/act_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_10sdp"
+                android:background="@drawable/layout_bg3"
+                android:drawableLeft="@drawable/search_icon"
+                android:drawablePadding="@dimen/_6sdp"
+                android:hint="Search"
+                android:padding="@dimen/_5sdp"
                 android:textSize="@dimen/_10sdp" />
+
         </LinearLayout>
 
         <View
@@ -57,36 +70,6 @@
             android:paddingLeft="@dimen/_10sdp"
             android:paddingRight="@dimen/_10sdp"
             android:paddingTop="@dimen/_16sdp">
-
-            <!-- <ImageView
-                 android:layout_width="0dp"
-                 android:layout_height="wrap_content"
-                 android:layout_weight="1"
-                 android:src="@drawable/gray_sheet" />
-
-             <ImageView
-                 android:layout_width="0dp"
-                 android:layout_height="wrap_content"
-                 android:layout_weight="1"
-                 android:src="@drawable/gray_sheet" />
-
-             <ImageView
-                 android:layout_width="0dp"
-                 android:layout_height="wrap_content"
-                 android:layout_weight="1"
-                 android:src="@drawable/gray_sheet" />
-
-             <ImageView
-                 android:layout_width="0dp"
-                 android:layout_height="wrap_content"
-                 android:layout_weight="1"
-                 android:src="@drawable/gray_sheet" />
-
-             <ImageView
-                 android:layout_width="0dp"
-                 android:layout_height="wrap_content"
-                 android:layout_weight="1"
-                 android:src="@drawable/gray_sheet" />-->
 
         </LinearLayout>
 

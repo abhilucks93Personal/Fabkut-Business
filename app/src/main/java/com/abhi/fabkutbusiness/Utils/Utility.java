@@ -43,10 +43,12 @@ import android.widget.Toast;
 
 import com.abhi.fabkutbusiness.R;
 import com.abhi.fabkutbusiness.booking.view.BookNowActivity;
+import com.abhi.fabkutbusiness.main.LoginActivity;
 import com.abhi.fabkutbusiness.main.NavigationMainActivity;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointments;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointmentsData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomer;
+import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelEmployee;
 import com.abhi.fabkutbusiness.main.model.ResponseModelEmployeeData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelLogin;
@@ -107,6 +109,25 @@ public class Utility {
         dialog.show();
     }
 
+    public static String formatDateForDisplay(String inputDate, String inputFormat, String outputFormat) {
+
+        Date parsed = null;
+        String outputDate = "";
+
+        SimpleDateFormat df_input = new SimpleDateFormat(inputFormat, java.util.Locale.getDefault());
+        SimpleDateFormat df_output = new SimpleDateFormat(outputFormat, java.util.Locale.getDefault());
+
+        try {
+            parsed = df_input.parse(inputDate);
+            outputDate = df_output.format(parsed);
+
+        } catch (ParseException e) {
+            Log.e(TAG, "ParseException - dateFormat");
+        }
+
+        return outputDate;
+
+    }
 
     public static Uri getImageUri(Context context, Bitmap mBitmap) {
         Uri uri = null;
@@ -295,6 +316,7 @@ public class Utility {
         editor.commit();
     }
 
+
     public static void addPreferences(Context context, String key, Boolean value) {
         SharedPreferences.Editor editor = context.getSharedPreferences("Preferences_", Context.MODE_PRIVATE).edit();
         editor.putBoolean(key, value);
@@ -307,9 +329,25 @@ public class Utility {
         return text;
     }
 
-    public static Boolean getPreferences(Context context, String key, boolean defaut) {
+    public static Double getPreferences(Context context, String key, Double defaultValue) {
         SharedPreferences prefs = context.getSharedPreferences("Preferences_", Context.MODE_PRIVATE);
-        Boolean text = prefs.getBoolean(key, defaut);
+        String text = prefs.getString(key, "");
+        if (text.equals(""))
+            return defaultValue;
+        return Double.valueOf(text);
+    }
+
+    public static int getPreferences(Context context, String key, int defaultValue) {
+        SharedPreferences prefs = context.getSharedPreferences("Preferences_", Context.MODE_PRIVATE);
+        String text = prefs.getString(key, "");
+        if (text.equals(""))
+            return defaultValue;
+        return Integer.parseInt(text);
+    }
+
+    public static Boolean getPreferences(Context context, String key, boolean defaultValue) {
+        SharedPreferences prefs = context.getSharedPreferences("Preferences_", Context.MODE_PRIVATE);
+        Boolean text = prefs.getBoolean(key, defaultValue);
         return text;
     }
 
@@ -923,7 +961,7 @@ public class Utility {
         ArrayList<String> slots = new ArrayList<>();
         try {
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            SimpleDateFormat sdf = new SimpleDateFormat(Constants.displayDateFormat + " HH:mm");
 
             String startTime = date + " " + _slot;
             Date dateStartTime = sdf.parse(startTime);
@@ -936,11 +974,11 @@ public class Utility {
                 SimpleDateFormat localDateFormat = new SimpleDateFormat("hh:mm");
                 String time = localDateFormat.format(slot);
 
-                if (bookedSlots.contains(time)) {
+                if (bookedSlots.contains(date + "/" + time)) {
                     slots = null;
                     break;
                 } else {
-                    slots.add(time);
+                    slots.add(date + "/" + time);
                 }
                 System.out.println("slot" + time);
                 dif += (Constants.slotDifference * 60 * 1000);
@@ -980,18 +1018,19 @@ public class Utility {
             return "";
     }
 
-    public static String getFormattedSlotTime(ArrayList<String> slots) {
+    public static String getFormattedSlotTime(ArrayList<String> slots, String bookingDate) {
 
         String slotTime = "";
 
-        slotTime += slots.get(0) + " - ";
 
+        String[] slotArray = slots.get(0).split("/");
+        slotTime += slotArray[1] + " - ";
 
         try {
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            SimpleDateFormat sdf = new SimpleDateFormat(Constants.displayDateFormat + " HH:mm");
 
-            String _time = getCurrentDate("dd/MM/yyyy") + " " + (slots.get(slots.size() - 1));
+            String _time = slots.get(slots.size() - 1);
             Date dateTime = sdf.parse(_time);
 
             long _lastTime = dateTime.getTime() + (Constants.slotDifference * 60 * 1000);
@@ -1001,10 +1040,20 @@ public class Utility {
             SimpleDateFormat localDateFormat = new SimpleDateFormat("hh:mm");
             String lastTime = localDateFormat.format(slot);
 
-            slotTime += lastTime;
+            slotArray = lastTime.split("/");
+            slotTime += slotArray[1];
+
+            //  slotTime += lastTime;
         } catch (Exception e) {
 
-            slotTime += slots.get(slots.size() - 1);
+            slotArray = slots.get(slots.size() - 1).split("/");
+            slotTime += slotArray[1];
+
+            //
+            //
+            //
+            //
+            // slotTime += slots.get(slots.size() - 1);
         }
         return slotTime;
     }
@@ -1032,7 +1081,7 @@ public class Utility {
             imageView.setTag("0");
             imageView.setLayoutParams(param);
             imageView.setImageDrawable(activity.getResources().getDrawable(R.drawable.gray_sheet));
-            imageView.setOnClickListener(new View.OnClickListener() {
+           /* imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (imageView.getTag().equals("0")) {
@@ -1040,7 +1089,7 @@ public class Utility {
                                 .putExtra("seatNum", _seatNum));
                     }
                 }
-            });
+            });*/
             seatImageViews.add(imageView);
             layout.addView(imageView);
         }
@@ -1124,20 +1173,21 @@ public class Utility {
     }
 
     public static void releaseSeat(Activity activity, String seatNum, int dataPos) {
-        ArrayList<String> seatStatusList = Utility.getSeatStatusData(activity, Constants.keySalonSeatsStatusList);
-        int seat = Integer.parseInt(seatNum);
-        if (seat >= 0) {
-            seatStatusList.set(seat, "0");
+        if (dataPos >= 0) {
+            ArrayList<String> seatStatusList = Utility.getSeatStatusData(activity, Constants.keySalonSeatsStatusList);
+            int seat = Integer.parseInt(seatNum);
+            if (seat >= 0) {
+                seatStatusList.set(seat, "0");
+            }
+            Utility.addPreferencesSeatStatusData(activity, Constants.keySalonSeatsStatusList, seatStatusList);
+
+            ResponseModelAppointments responseModelBookings = Utility.getResponseModelBookings(activity, Constants.keySalonBookingData);
+
+            if (responseModelBookings != null) {
+                responseModelBookings.getData().remove(dataPos);
+            }
+            Utility.addPreferencesBookingData(activity, Constants.keySalonBookingData, responseModelBookings);
         }
-        Utility.addPreferencesSeatStatusData(activity, Constants.keySalonSeatsStatusList, seatStatusList);
-
-        ResponseModelAppointments responseModelBookings = Utility.getResponseModelBookings(activity, Constants.keySalonBookingData);
-
-        if (responseModelBookings != null) {
-            responseModelBookings.getData().remove(dataPos);
-        }
-        Utility.addPreferencesBookingData(activity, Constants.keySalonBookingData, responseModelBookings);
-
     }
 
 
@@ -1193,4 +1243,138 @@ public class Utility {
 
 
     }
+
+    public static int getTaxAmount(int subTotal, Double taxPercentage) {
+
+        int taxAmount;
+
+        try {
+            taxAmount = (int) (subTotal * (taxPercentage / 100));
+        } catch (Exception e) {
+            return 0;
+        }
+        return taxAmount;
+    }
+
+    public static int getBillingSubTotalAmount(ArrayList<ResponseModelRateInfoData> services) {
+
+        int subTotal = 0;
+
+        for (ResponseModelRateInfoData data : services) {
+            subTotal += Integer.parseInt(data.getRate());
+        }
+
+        return subTotal;
+    }
+
+    public static void updateOutstandingAmount(Activity activity, int unpaidAmount) {
+
+        int previousBalance = getPreferences(activity, Constants.keySalonPreviousBalance, 0);
+        previousBalance += unpaidAmount;
+        addPreferences(activity, Constants.keySalonPreviousBalance, "" + previousBalance);
+    }
+
+    public static int getPreviousBalance(Activity activity, String customerId) {
+
+
+        ResponseModelCustomer dataCustomer = Utility.getResponseModelCustomer(activity, Constants.keySalonCustomerData);
+
+        for (ResponseModelCustomerData data : dataCustomer.getData()) {
+
+            if (data.getCustomerId().equals(customerId)) {
+
+                return data.getPrevious_balance();
+            }
+        }
+
+        return 0;
+    }
+
+    public static void setPreviousBalance(Activity activity, String customerId, int unpaidAmount) {
+
+
+        ResponseModelCustomer dataCustomer = Utility.getResponseModelCustomer(activity, Constants.keySalonCustomerData);
+
+        for (ResponseModelCustomerData data : dataCustomer.getData()) {
+
+            if (data.getCustomerId().equals(customerId)) {
+
+                data.setPrevious_balance(data.getPrevious_balance() + unpaidAmount);
+                break;
+            }
+        }
+
+
+        Utility.addPreferencesCustomerData(activity, Constants.keySalonCustomerData, dataCustomer);
+    }
+
+    public static long getTotalRevenue(Activity activity, String customerId) {
+
+
+        ResponseModelCustomer dataCustomer = Utility.getResponseModelCustomer(activity, Constants.keySalonCustomerData);
+
+        for (ResponseModelCustomerData data : dataCustomer.getData()) {
+
+            if (data.getCustomerId().equals(customerId)) {
+
+                return data.getTotal_revenue();
+            }
+        }
+
+        return 0;
+    }
+
+    public static void setTotalRevenue(Activity activity, String customerId, long totalAmount) {
+
+
+        ResponseModelCustomer dataCustomer = Utility.getResponseModelCustomer(activity, Constants.keySalonCustomerData);
+
+        for (ResponseModelCustomerData data : dataCustomer.getData()) {
+
+            if (data.getCustomerId().equals(customerId)) {
+
+                data.setTotal_revenue(data.getTotal_revenue() + totalAmount);
+                break;
+            }
+        }
+
+
+        Utility.addPreferencesCustomerData(activity, Constants.keySalonCustomerData, dataCustomer);
+    }
+
+    public static int getTotalVisits(Activity activity, String customerId) {
+
+
+        ResponseModelCustomer dataCustomer = Utility.getResponseModelCustomer(activity, Constants.keySalonCustomerData);
+
+        for (ResponseModelCustomerData data : dataCustomer.getData()) {
+
+            if (data.getCustomerId().equals(customerId)) {
+
+                return data.getTotal_visits();
+            }
+        }
+
+        return 0;
+    }
+
+    public static void setTotalVisits(Activity activity, String customerId) {
+
+
+        ResponseModelCustomer dataCustomer = Utility.getResponseModelCustomer(activity, Constants.keySalonCustomerData);
+
+        for (ResponseModelCustomerData data : dataCustomer.getData()) {
+
+            if (data.getCustomerId().equals(customerId)) {
+
+                data.setTotal_visits(data.getTotal_visits() + 1);
+                break;
+            }
+        }
+
+
+        Utility.addPreferencesCustomerData(activity, Constants.keySalonCustomerData, dataCustomer);
+    }
+
+
 }

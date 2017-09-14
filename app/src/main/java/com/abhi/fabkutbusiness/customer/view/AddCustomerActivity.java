@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.abhi.fabkutbusiness.R;
 import com.abhi.fabkutbusiness.Utils.Constants;
 import com.abhi.fabkutbusiness.Utils.Utility;
+import com.abhi.fabkutbusiness.booking.view.BookNowActivity;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomer;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
 
@@ -123,9 +124,15 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
 
             Utility.addPreferencesCustomerData(this, Constants.keySalonCustomerData, responseModelCustomer);
 
-            Intent intent = new Intent();
+            String seatNum = Utility.getEmptySeatNum(this);
+
+           startActivity(new Intent(AddCustomerActivity.this, BookNowActivity.class)
+                    .putExtra("data", responseModelCustomerData)
+                    .putExtra("seatNum", seatNum));
+
+          /*  Intent intent = new Intent();
             intent.putExtra("data", responseModelCustomerData);
-            setResult(RESULT_OK, intent);
+            setResult(RESULT_OK, intent);*/
             finish();
 
         }

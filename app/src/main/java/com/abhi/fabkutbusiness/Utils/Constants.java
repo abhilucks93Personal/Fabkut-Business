@@ -30,10 +30,16 @@ public class Constants {
     public static String keySalonOpenTime = "keySalonOpenTime";
     public static String keySalonSeatsStatusList = "keySalonSeatsStatusList";
     public static String keySalonBookingData = "keySalonBookingData";
-    public static String keySalonCancelBookingData="keySalonCancelBookingData";
-    public static String keySalonCloseTime = "keySalonCloseTime";
+    public static String keySalonCancelBookingData = "keySalonCancelBookingData";
+    public static String keySalonTaxPercentage = "keySalonTaxPercentage";
+    public static String keySalonPreviousBalance = "keySalonPreviousBalance";
 
+    public static String keySalonCloseTime = "keySalonCloseTime";
     public static String timeStartAfternoon = "12:00:00.0000000";
     public static String timeEndAfternoon = "16:00:00.0000000";
     public static int slotDifference = 15; // in minutes
+
+
+    public static String msgBillingUnpaidAmountSync = "Unable to sync outstanding amount with the server.\nPlease check your Internet Connection or ask your customer to make full payment of this billing only.";
+    public static String displayDateFormat = "MMM dd, yyyy";
 }

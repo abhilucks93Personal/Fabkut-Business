@@ -22,21 +22,51 @@ public class ResponseModelCustomerData implements Serializable {
     private String allergies;
     private String customerProfileImage;
     private String customerProfilePercentage;
-
+    private Integer previous_balance;
+    private Long total_revenue;
+    private Integer total_visits;
 
     public ResponseModelCustomerData(String business_id, String business_Name, String endUser_FirstName, String endUser_LastName, String gender, String email, String contact_no, String allergies) {
+        this.customerId = "" + System.currentTimeMillis();
         this.business_id = business_id;
         this.business_Name = business_Name;
-        EndUser_FirstName = endUser_FirstName;
-        EndUser_LastName = endUser_LastName;
+        this.EndUser_FirstName = endUser_FirstName;
+        this.EndUser_LastName = endUser_LastName;
         this.gender = gender;
         this.email = email;
         this.contact_no = contact_no;
         this.allergies = allergies;
+        this.previous_balance = 0;
+        this.total_revenue = Long.valueOf(0);
+        this.total_visits = 0;
     }
 
     public ResponseModelCustomerData() {
 
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getCustomerProfileImage() {
+        return customerProfileImage;
+    }
+
+    public void setCustomerProfileImage(String customerProfileImage) {
+        this.customerProfileImage = customerProfileImage;
+    }
+
+    public String getCustomerProfilePercentage() {
+        return customerProfilePercentage;
+    }
+
+    public void setCustomerProfilePercentage(String customerProfilePercentage) {
+        this.customerProfilePercentage = customerProfilePercentage;
     }
 
     public String getBusiness_id() {
@@ -113,11 +143,41 @@ public class ResponseModelCustomerData implements Serializable {
 
     public String getAllergies() {
         if (allergies == null)
-            return "";
+            allergies = "";
         return allergies;
     }
 
     public void setAllergies(String allergies) {
         this.allergies = allergies;
+    }
+
+    public Integer getPrevious_balance() {
+        if (previous_balance == null)
+            return 0;
+        return previous_balance;
+    }
+
+    public void setPrevious_balance(Integer previous_balance) {
+        this.previous_balance = previous_balance;
+    }
+
+    public Long getTotal_revenue() {
+        if (total_revenue == null)
+            return Long.valueOf(0);
+        return total_revenue;
+    }
+
+    public void setTotal_revenue(Long total_revenue) {
+        this.total_revenue = total_revenue;
+    }
+
+    public Integer getTotal_visits() {
+        if (total_visits == null)
+            return 0;
+        return total_visits;
+    }
+
+    public void setTotal_visits(Integer total_visits) {
+        this.total_visits = total_visits;
     }
 }

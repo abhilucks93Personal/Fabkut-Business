@@ -2,6 +2,7 @@ package com.abhi.fabkutbusiness.booking.controller;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,9 @@ import android.widget.Filter;
 import android.widget.TextView;
 
 import com.abhi.fabkutbusiness.R;
+import com.abhi.fabkutbusiness.Utils.Utility;
 import com.abhi.fabkutbusiness.booking.view.BookNowActivity;
+import com.abhi.fabkutbusiness.main.NavigationMainActivity;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
 
 import java.util.ArrayList;
@@ -53,13 +56,21 @@ public class CustomerDataAdapter extends ArrayAdapter<ResponseModelCustomerData>
             }
             final ResponseModelCustomerData responseModelCustomerData = getItem(position);
             TextView name = (TextView) convertView.findViewById(R.id.textView);
-            name.setText("" + responseModelCustomerData.getEndUser_FirstName());
+            name.setText("" + responseModelCustomerData.getEndUser_FirstName() + " (" + responseModelCustomerData.getContact_no() + ")");
 
 
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((BookNowActivity) mContext).setData(responseModelCustomerData);
+
+                    Activity activity = (NavigationMainActivity) mContext;
+
+                    String seatNum = Utility.getEmptySeatNum(activity);
+
+                    activity.startActivity(new Intent(activity, BookNowActivity.class)
+                            .putExtra("data", responseModelCustomerData)
+                            .putExtra("seatNum", seatNum));
+                    //    ((BookNowActivity) mContext).setData(responseModelCustomerData);
 
                 }
             });
@@ -84,7 +95,8 @@ public class CustomerDataAdapter extends ArrayAdapter<ResponseModelCustomerData>
                 if (constraint != null) {
                     responseModelCustomerDatas_Suggestion.clear();
                     for (ResponseModelCustomerData responseModelCustomerData : responseModelCustomerDatas_All) {
-                        if (responseModelCustomerData.getEndUser_FirstName().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
+                        if (responseModelCustomerData.getEndUser_FirstName().toLowerCase().startsWith(constraint.toString().toLowerCase())
+                                || responseModelCustomerData.getContact_no().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
                             responseModelCustomerDatas_Suggestion.add(responseModelCustomerData);
                         }
                     }

@@ -3,6 +3,8 @@ package com.abhi.fabkutbusiness.main.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.abhi.fabkutbusiness.billing.model.ResponseModelBillPaymentData;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 public class ResponseModelAppointmentsData implements Parcelable {
 
     private long bookingId;
+
+    private String businessId;
 
     private String customerId;
 
@@ -40,6 +44,8 @@ public class ResponseModelAppointmentsData implements Parcelable {
 
     private String bookingDate;
 
+    private String bookingTime;
+
     private String totalAmount;
 
     private String totalTime;
@@ -52,12 +58,15 @@ public class ResponseModelAppointmentsData implements Parcelable {
 
     private ResponseModelEmployeeData employee;
 
+    private ResponseModelBillPaymentData billPayment;
+
     public ResponseModelAppointmentsData() {
     }
 
 
     protected ResponseModelAppointmentsData(Parcel in) {
         bookingId = in.readLong();
+        businessId = in.readString();
         customerId = in.readString();
         customerMobile = in.readString();
         customerProfileImage = in.readString();
@@ -71,12 +80,44 @@ public class ResponseModelAppointmentsData implements Parcelable {
         bookingStatus = in.readInt();
         cancelReason = in.readString();
         bookingDate = in.readString();
+        bookingTime = in.readString();
         totalAmount = in.readString();
         totalTime = in.readString();
         seatNumber = in.readString();
         services = in.createTypedArrayList(ResponseModelRateInfoData.CREATOR);
         slots = in.createStringArrayList();
         employee = in.readParcelable(ResponseModelEmployeeData.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(bookingId);
+        dest.writeString(businessId);
+        dest.writeString(customerId);
+        dest.writeString(customerMobile);
+        dest.writeString(customerProfileImage);
+        dest.writeString(customerProfilePercentage);
+        dest.writeString(customerEndUser_FirstName);
+        dest.writeString(customerEndUser_LastName);
+        dest.writeString(customerGender);
+        dest.writeString(customerEmail);
+        dest.writeString(customerAllergies);
+        dest.writeInt(bookingType);
+        dest.writeInt(bookingStatus);
+        dest.writeString(cancelReason);
+        dest.writeString(bookingDate);
+        dest.writeString(bookingTime);
+        dest.writeString(totalAmount);
+        dest.writeString(totalTime);
+        dest.writeString(seatNumber);
+        dest.writeTypedList(services);
+        dest.writeStringList(slots);
+        dest.writeParcelable(employee, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<ResponseModelAppointmentsData> CREATOR = new Creator<ResponseModelAppointmentsData>() {
@@ -91,41 +132,20 @@ public class ResponseModelAppointmentsData implements Parcelable {
         }
     };
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(bookingId);
-        dest.writeString(customerId);
-        dest.writeString(customerMobile);
-        dest.writeString(customerProfileImage);
-        dest.writeString(customerProfilePercentage);
-        dest.writeString(customerEndUser_FirstName);
-        dest.writeString(customerEndUser_LastName);
-        dest.writeString(customerGender);
-        dest.writeString(customerEmail);
-        dest.writeString(customerAllergies);
-        dest.writeInt(bookingType);
-        dest.writeInt(bookingStatus);
-        dest.writeString(cancelReason);
-        dest.writeString(bookingDate);
-        dest.writeString(totalAmount);
-        dest.writeString(totalTime);
-        dest.writeString(seatNumber);
-        dest.writeTypedList(services);
-        dest.writeStringList(slots);
-        dest.writeParcelable(employee, flags);
-    }
-
     public long getBookingId() {
         return bookingId;
     }
 
     public void setBookingId(long bookingId) {
         this.bookingId = bookingId;
+    }
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
     }
 
     public String getCustomerId() {
@@ -232,7 +252,19 @@ public class ResponseModelAppointmentsData implements Parcelable {
         this.bookingDate = bookingDate;
     }
 
+    public String getBookingTime() {
+        return bookingTime;
+    }
+
+    public void setBookingTime(String bookingTime) {
+        this.bookingTime = bookingTime;
+    }
+
     public String getTotalAmount() {
+        if (totalAmount == null)
+            return "0";
+        if (totalAmount.equals(""))
+            return "0";
         return totalAmount;
     }
 
@@ -280,7 +312,13 @@ public class ResponseModelAppointmentsData implements Parcelable {
         this.employee = employee;
     }
 
-    public static Creator<ResponseModelAppointmentsData> getCREATOR() {
-        return CREATOR;
+    public ResponseModelBillPaymentData getBillPayment() {
+        return billPayment;
     }
+
+    public void setBillPayment(ResponseModelBillPaymentData billPayment) {
+        this.billPayment = billPayment;
+    }
+
+
 }

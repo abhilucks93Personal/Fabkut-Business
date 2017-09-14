@@ -13,24 +13,16 @@
         <item>Dashboard</item>
     </string-array>
 
-    <string-array name="service_name_array">
-        <item>Party Mehndi (951 Rs.) (40 min)</item>
-        <item>Package for Gents (1051 Rs.) (60 min)</item>
-    </string-array>
+
 
     <string-array name="mode_payment_array">
         <item>Cash</item>
         <item>Debit Card</item>
+        <item>Credit Card</item>
         <item>Paytm</item>
     </string-array>
 
-    <string-array name="employee_array">
-        <item>Marry</item>
-        <item>Arpit</item>
-        <item>Shray</item>
-        <item>Emuvel</item>
-        <item>Shyam</item>
-    </string-array>
+
 
 
 </resources>

@@ -5,19 +5,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.abhi.fabkutbusiness.R;
 import com.abhi.fabkutbusiness.Utils.Utility;
-import com.abhi.fabkutbusiness.booking.view.AddBookingServiceActivity;
-import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfoData;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 
 
 public class SlotAdapter extends RecyclerView.Adapter<SlotAdapter.MyViewHolder> {
@@ -30,10 +24,16 @@ public class SlotAdapter extends RecyclerView.Adapter<SlotAdapter.MyViewHolder> 
     private int mLayoutResourceId;
     private ArrayList<String> bookedSlots;
     Boolean isEdit;
+    private String currentDate;
 
 
     public void setSlotSelection(int slotSelection) {
         this.slotSelection = slotSelection;
+        notifyDataSetChanged();
+    }
+
+    public void setDate(String currentDate) {
+        this.currentDate = currentDate;
         notifyDataSetChanged();
     }
 
@@ -51,7 +51,7 @@ public class SlotAdapter extends RecyclerView.Adapter<SlotAdapter.MyViewHolder> 
         notifyDataSetChanged();
     }
 
-    public SlotAdapter(Activity context, int mLayoutResourceId, ArrayList<String> slotList, ArrayList<String> selectedSlotList, ArrayList<String> bookedSlotList, Boolean isEdit) {
+    public SlotAdapter(Activity context, int mLayoutResourceId, ArrayList<String> slotList, ArrayList<String> selectedSlotList, ArrayList<String> bookedSlotList, Boolean isEdit, String currentDate) {
 
         this.context = context;
         this.slotList = slotList;
@@ -59,6 +59,7 @@ public class SlotAdapter extends RecyclerView.Adapter<SlotAdapter.MyViewHolder> 
         this.mLayoutResourceId = mLayoutResourceId;
         this.isEdit = isEdit;
         this.selectedSlotList = selectedSlotList;
+        this.currentDate = currentDate;
     }
 
     public ArrayList<String> getSelectedSlotList() {
@@ -78,15 +79,15 @@ public class SlotAdapter extends RecyclerView.Adapter<SlotAdapter.MyViewHolder> 
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final String slot = slotList.get(position);
 
-        if (bookedSlots.contains(slot)) {
+        if (bookedSlots.contains(currentDate + "/" + slot)) {
             holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorGrey));
-        } else if (selectedSlotList.contains(slot))
+        } else if (selectedSlotList.contains(currentDate + "/" + slot))
             holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorBlue2));
         else
             holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorBlack));
 
 
-       /* if (isEdit) {
+        /*if (isEdit) {
             if (selectedSlotList.contains(slot))
                 holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorGreen));
         }*/
@@ -98,11 +99,11 @@ public class SlotAdapter extends RecyclerView.Adapter<SlotAdapter.MyViewHolder> 
 
                 if (slotSelection == 0)
                     Utility.showToast(context, "Please select services.");
-                else if (bookedSlots.contains(slot)) {
+                else if (bookedSlots.contains(currentDate + "/" + slot)) {
                     Utility.showToast(context, "Slot not free.");
                 } else {
-                    String currDate = Utility.getCurrentDate("dd/MM/yyyy");
-                    selectedSlotList = Utility.getSelectedSlotList(currDate, slot, slotSelection, bookedSlots);
+                    //   String currDate = Utility.getCurrentDate("dd/MM/yyyy");
+                    selectedSlotList = Utility.getSelectedSlotList(currentDate, slot, slotSelection, bookedSlots);
                     if (selectedSlotList == null) {
                         selectedSlotList = new ArrayList<>();
                         Utility.showToast(context, "Slot not free.");

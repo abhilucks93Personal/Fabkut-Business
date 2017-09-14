@@ -1,7 +1,6 @@
 package com.abhi.fabkutbusiness.accounting.view;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -9,12 +8,10 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.abhi.fabkutbusiness.R;
 import com.abhi.fabkutbusiness.accounting.controller.AccountingPagerAdapter;
-import com.abhi.fabkutbusiness.billing.model.BillingData;
 
 /**
  * Created by abhi on 16/06/17.

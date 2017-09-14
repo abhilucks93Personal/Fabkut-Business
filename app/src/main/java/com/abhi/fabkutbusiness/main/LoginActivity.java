@@ -17,6 +17,7 @@ import com.abhi.fabkutbusiness.Utils.Utility;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointments;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointmentsData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomer;
+import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelEmployee;
 import com.abhi.fabkutbusiness.main.model.ResponseModelLogin;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfo;
@@ -139,6 +140,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 String seatsNum = modelLogin.getData().get(0).getSeats();
                 Utility.addPreferences(LoginActivity.this, Constants.keySalonSeatsNum, seatsNum);
 
+                Double tax_percentage = modelLogin.getData().get(0).getTax_percentage();
+                Utility.addPreferences(LoginActivity.this, Constants.keySalonTaxPercentage, "" + tax_percentage);
+
+
                 int seats = Integer.parseInt(seatsNum);
                 ArrayList<String> seatStatusList = new ArrayList<>();
                 for (int i = 0; i < seats; i++) {
@@ -160,6 +165,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } else if (obj instanceof ResponseModelCustomer) {
             ResponseModelCustomer modelCustomer = (ResponseModelCustomer) obj;
             if (modelCustomer.getSTATUS().equals("200")) {
+
+                // ask to send customerId from backend
+
+                for (ResponseModelCustomerData data : modelCustomer.getData()) {
+                    if (data.getCustomerId() == null)
+                        data.setCustomerId(data.getContact_no());
+                }
+
                 Utility.addPreferencesCustomerData(LoginActivity.this, Constants.keySalonCustomerData, modelCustomer);
                 RetrofitApi.getInstance().employeeApiMethod(this, this, businessId);
 

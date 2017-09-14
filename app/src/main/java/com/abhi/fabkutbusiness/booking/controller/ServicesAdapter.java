@@ -9,15 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.abhi.fabkutbusiness.R;
-import com.abhi.fabkutbusiness.booking.view.AddBookingServiceActivity;
+import com.abhi.fabkutbusiness.booking.view.EditBookingServiceActivity;
+import com.abhi.fabkutbusiness.booking.view.BookNowActivity;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfoData;
-import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfoData;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class ServicesAdapter extends RecyclerView.Adapter<ServicesAdapter.MyViewHolder> {
@@ -119,7 +116,10 @@ public class ServicesAdapter extends RecyclerView.Adapter<ServicesAdapter.MyView
             totalTime += Integer.parseInt(rateData.getEta());
 
             if (position == (rateDataList.size() - 1)) {
-                ((AddBookingServiceActivity) context).setServiceTotal(totalCost, totalTime);
+                if (context instanceof BookNowActivity)
+                    ((BookNowActivity) context).setServiceTotal(totalCost, totalTime);
+                else if (context instanceof EditBookingServiceActivity)
+                    ((EditBookingServiceActivity) context).setServiceTotal(totalCost, totalTime);
             }
         }
 
