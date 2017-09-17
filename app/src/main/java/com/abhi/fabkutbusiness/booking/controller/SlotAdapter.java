@@ -20,6 +20,7 @@ public class SlotAdapter extends RecyclerView.Adapter<SlotAdapter.MyViewHolder> 
     private int slotSelected = -1;
     private Activity context;
     private List<String> slotList;
+    private ArrayList<String> elapsedSlotList;
     private ArrayList<String> selectedSlotList;
     private int mLayoutResourceId;
     private ArrayList<String> bookedSlots;
@@ -51,10 +52,11 @@ public class SlotAdapter extends RecyclerView.Adapter<SlotAdapter.MyViewHolder> 
         notifyDataSetChanged();
     }
 
-    public SlotAdapter(Activity context, int mLayoutResourceId, ArrayList<String> slotList, ArrayList<String> selectedSlotList, ArrayList<String> bookedSlotList, Boolean isEdit, String currentDate) {
+    public SlotAdapter(Activity context, int mLayoutResourceId, ArrayList<String> slotList, ArrayList<String> elapsedSlotList, ArrayList<String> selectedSlotList, ArrayList<String> bookedSlotList, Boolean isEdit, String currentDate) {
 
         this.context = context;
         this.slotList = slotList;
+        this.elapsedSlotList = elapsedSlotList;
         this.bookedSlots = bookedSlotList;
         this.mLayoutResourceId = mLayoutResourceId;
         this.isEdit = isEdit;
@@ -79,18 +81,15 @@ public class SlotAdapter extends RecyclerView.Adapter<SlotAdapter.MyViewHolder> 
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final String slot = slotList.get(position);
 
-        if (bookedSlots.contains(currentDate + "/" + slot)) {
+        if (elapsedSlotList.contains(currentDate + "/" + slot)) {
             holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorGrey));
+        } else if (bookedSlots.contains(currentDate + "/" + slot)) {
+            holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorRed));
         } else if (selectedSlotList.contains(currentDate + "/" + slot))
             holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorBlue2));
         else
             holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorBlack));
 
-
-        /*if (isEdit) {
-            if (selectedSlotList.contains(slot))
-                holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorGreen));
-        }*/
 
         holder.tvSlots.setText(slot);
         holder.tvSlots.setOnClickListener(new View.OnClickListener() {
@@ -101,31 +100,24 @@ public class SlotAdapter extends RecyclerView.Adapter<SlotAdapter.MyViewHolder> 
                     Utility.showToast(context, "Please select services.");
                 else if (bookedSlots.contains(currentDate + "/" + slot)) {
                     Utility.showToast(context, "Slot not free.");
+                } else if (elapsedSlotList.contains(currentDate + "/" + slot)) {
+                    Utility.showToast(context, "Slot has been elapsed.");
                 } else {
                     //   String currDate = Utility.getCurrentDate("dd/MM/yyyy");
                     selectedSlotList = Utility.getSelectedSlotList(currentDate, slot, slotSelection, bookedSlots);
                     if (selectedSlotList == null) {
                         selectedSlotList = new ArrayList<>();
                         Utility.showToast(context, "Slot not free.");
+                    } else {
+                        if (!Utility.isSeatAvailable(context, selectedSlotList.get(0), selectedSlotList.get(selectedSlotList.size() - 1))) {
+                            selectedSlotList = new ArrayList<>();
+                            Utility.showToast(context, "Seat not free.");
+                        }
                     }
                     notifyDataSetChanged();
-
                 }
             }
         });
-
-
-
-         /* if (position == slotSelected)
-            selectedSlotList.clear();
-
-        if (slotSelected != -1 && position >= slotSelected && position <= (slotSelected + slotSelection)) {
-            selectedSlotList.add(slot);
-            holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorBlue2));
-        } else
-            holder.tvSlots.setTextColor(context.getResources().getColor(R.color.colorBlack));
-*/
-
     }
 
 

@@ -18,7 +18,6 @@ public class ResponseModelLoginData {
     private Double tax_percentage;
 
 
-
     public String getStatus() {
         return Status;
     }
@@ -85,7 +84,7 @@ public class ResponseModelLoginData {
 
     public String getSeats() {
         if (seats == null)
-            return "3";
+            return "2";
         return seats;
     }
 

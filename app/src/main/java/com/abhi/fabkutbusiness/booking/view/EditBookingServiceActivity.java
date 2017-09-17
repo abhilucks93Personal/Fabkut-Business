@@ -45,6 +45,7 @@ public class EditBookingServiceActivity extends AppCompatActivity implements Vie
     boolean isEdit;
     private ArrayList<String> bookedSlots = new ArrayList<>();
     private String bookingDate;
+    private ArrayList<String> elapsedSlots;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,7 +95,9 @@ public class EditBookingServiceActivity extends AppCompatActivity implements Vie
             selectedSlots.addAll(data.getSlots());
             bookingDate = data.getBookingDate();
         }
-        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, selectedSlots, bookedSlots, isEdit, bookingDate);
+        elapsedSlots = Utility.getElapsedSlots(this);
+
+        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, elapsedSlots, selectedSlots, bookedSlots, isEdit, bookingDate);
         rvSlots.setAdapter(mAdapterSlots);
         tvMorning.performClick();
 

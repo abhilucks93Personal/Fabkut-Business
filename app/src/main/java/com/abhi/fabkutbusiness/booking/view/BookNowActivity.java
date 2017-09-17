@@ -54,7 +54,7 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
     ServicesAdapter mAdapterServices;
     SlotAdapter mAdapterSlots;
     ArrayList<ResponseModelRateInfoData> rateInfoDatas;
-    ArrayList<String> slots;
+    ArrayList<String> slots, elapsedSlots;
     int totalTime = 0, totalCost = 0;
     ArrayList<String> bookedSlots = new ArrayList<>();
     TextView tvDate;
@@ -75,7 +75,7 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
 
     private void initData() {
 
-        seatNum = getIntent().getStringExtra("seatNum");
+
         ResponseModelCustomerData responseModelCustomerData = (ResponseModelCustomerData) getIntent().getSerializableExtra("data");
         setData(responseModelCustomerData);
 
@@ -89,7 +89,10 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         slots = new ArrayList<>();
         ArrayList<String> selectedSlots = new ArrayList<>();
 
-        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, selectedSlots, bookedSlots, false, currentDate);
+        elapsedSlots = Utility.getElapsedSlots(this);
+
+
+        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots,elapsedSlots, selectedSlots, bookedSlots, false, currentDate);
         rvSlots.setAdapter(mAdapterSlots);
         tvMorning.performClick();
 
@@ -177,18 +180,25 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
                     dataAppointment.setEmployee(mAdapterStylist.getSelectedStylistDataList());
                     dataAppointment.setSlots(mAdapterSlots.getSelectedSlotList());
 
-                    int seat = Integer.parseInt(seatNum);
+
+                    seatNum = String.valueOf(Utility.getAvailableSeat(BookNowActivity.this, dataAppointment.getSlots().get(0), dataAppointment.getSlots().get(dataAppointment.getSlots().size() - 1)));
+                    dataAppointment.setSeatNumber(seatNum);
+
 
                     for (ResponseModelRateInfoData rateData : dataAppointment.getServices()) {
                         rateData.setEmployee_name(dataAppointment.getEmployee().getEmp_name());
                         rateData.setEmployee_id(dataAppointment.getEmployee().getEmp_id());
                     }
 
-                    if (seat >= 0) {
+                    if (Utility.isCurrentBooking(mAdapterSlots.getSelectedSlotList().get(0))) {
+
+                        dataAppointment.setBookingStatus(Constants.BOOKING_STATUS_CONFIRM);
 
                         Utility.bookSeat(BookNowActivity.this, dataAppointment);
+                        Utility.updateSeatSlots(BookNowActivity.this, dataAppointment.getSeatNumber(), dataAppointment.getSlots());
 
                     } else {
+                        dataAppointment.setBookingStatus(Constants.BOOKING_STATUS_WAITING);
                         ResponseModelAppointments responseModelAppointments = Utility.getResponseModelAppointments(BookNowActivity.this, Constants.keySalonAppointmentsData);
 
                         if (responseModelAppointments != null) {
@@ -198,6 +208,8 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
                     }
 
                     Utility.setEmployeeSelectedSlots(BookNowActivity.this, dataAppointment.getEmployee().getEmp_id(), dataAppointment.getSlots());
+
+                    Utility.updateSeatSlots(BookNowActivity.this, dataAppointment.getSeatNumber(), dataAppointment.getSlots());
 
                     finish();
                 }
@@ -360,10 +372,9 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         dataAppointment.setBookingId(System.currentTimeMillis());
         dataAppointment.setCustomerEndUser_FirstName(responseModelCustomerData.getEndUser_FirstName());
         dataAppointment.setCustomerEndUser_LastName(responseModelCustomerData.getEndUser_LastName());
-        dataAppointment.setBookingStatus(Constants.BOOKING_STATUS_CONFIRM);
         dataAppointment.setBookingType(Constants.BOOKING_TYPE_OFFLINE);
         dataAppointment.setCustomerMobile(responseModelCustomerData.getContact_no());
-        dataAppointment.setSeatNumber(seatNum);
+
 
     }
 

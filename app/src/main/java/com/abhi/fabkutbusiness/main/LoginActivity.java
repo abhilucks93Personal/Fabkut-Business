@@ -21,6 +21,8 @@ import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelEmployee;
 import com.abhi.fabkutbusiness.main.model.ResponseModelLogin;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfo;
+import com.abhi.fabkutbusiness.main.model.ResponseModelSeats;
+import com.abhi.fabkutbusiness.main.model.ResponseModelSeatsData;
 import com.abhi.fabkutbusiness.retrofit.RetrofitApi;
 
 import java.util.ArrayList;
@@ -153,9 +155,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 ResponseModelAppointments responseModelAppointments = new ResponseModelAppointments();
                 responseModelAppointments.setData(new ArrayList<ResponseModelAppointmentsData>());
+
+                ArrayList<ResponseModelSeatsData> seatsData = new ArrayList<>();
+
+                for (int i = 0; i < Integer.parseInt(modelLogin.getData().get(0).getSeats()); i++) {
+                    seatsData.add(new ResponseModelSeatsData());
+                }
+
+                ResponseModelSeats responseModelSeats = new ResponseModelSeats();
+                responseModelSeats.setData(seatsData);
+
                 Utility.addPreferencesAppointmentsData(LoginActivity.this, Constants.keySalonAppointmentsData, responseModelAppointments);
                 Utility.addPreferencesBookingData(LoginActivity.this, Constants.keySalonBookingData, responseModelAppointments);
                 Utility.addPreferencesCancelBookingData(LoginActivity.this, Constants.keySalonCancelBookingData, responseModelAppointments);
+                Utility.addPreferencesSeatsData(LoginActivity.this, Constants.keySalonSeatsData, responseModelSeats);
 
                 RetrofitApi.getInstance().customerApiMethod(this, this, businessId);
 

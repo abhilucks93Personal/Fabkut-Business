@@ -1,5 +1,6 @@
 package com.abhi.fabkutbusiness.main;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -36,6 +38,8 @@ import com.abhi.fabkutbusiness.main.model.ResponseModelAppointmentsData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
 
 import java.util.ArrayList;
+
+import okhttp3.internal.Util;
 
 public class NavigationMainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -206,9 +210,8 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
                         break;
 
                     case R.id.nav_logout:
-                        Utility.showToast(NavigationMainActivity.this, "Logout");
+                        logoutDialog();
                         break;
-
 
                 }
 
@@ -266,6 +269,41 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
+    }
+
+    private void logoutDialog() {
+
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(NavigationMainActivity.this);
+
+
+        alertDialogBuilder.setTitle("Alert");
+        alertDialogBuilder.setCancelable(true);
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage("Do you want to Logout ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Utility.clearPreferenceData(NavigationMainActivity.this);
+                        startActivity(new Intent(NavigationMainActivity.this, LoginActivity.class));
+                        finishAffinity();
+                        dialog.dismiss();
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+
+                    }
+                });
+
+        // create alert dialog
+        android.support.v7.app.AlertDialog alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialog.show();
+
     }
 
     @Override
@@ -333,8 +371,6 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
             case R.id.tv_inventory:
 
-                Utility.clearPreferenceData(NavigationMainActivity.this);
-                finish();
 
                 break;
 
@@ -373,27 +409,26 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
 
     public void bookWaitingCustomer(int position) {
-        String seatNum = Utility.getEmptySeatNum(NavigationMainActivity.this);
 
-        if (seatNum.equals("-1")) {
-            Utility.showToast(NavigationMainActivity.this, "No seat available");
-        } else {
 
-            ResponseModelAppointments responseModelAppointments = Utility.getResponseModelAppointments(NavigationMainActivity.this, Constants.keySalonAppointmentsData);
+        ResponseModelAppointments responseModelAppointments = Utility.getResponseModelAppointments(NavigationMainActivity.this, Constants.keySalonAppointmentsData);
 
-            if (responseModelAppointments != null) {
+        if (responseModelAppointments != null) {
 
-                ResponseModelAppointmentsData _dataAppointment = responseModelAppointments.getData().get(position);
-                _dataAppointment.setSeatNumber(seatNum);
-                Utility.bookSeat(NavigationMainActivity.this, _dataAppointment);
-                responseModelAppointments.getData().remove(position);
-                Utility.addPreferencesAppointmentsData(NavigationMainActivity.this, Constants.keySalonAppointmentsData, responseModelAppointments);
+            ResponseModelAppointmentsData _dataAppointment = responseModelAppointments.getData().get(position);
+            if (Utility.isSeatAvailable(this, Integer.parseInt(_dataAppointment.getSeatNumber()))) {
+                if (Utility.checkSlot(this, _dataAppointment.getSlots())) {
+                    Utility.bookSeat(NavigationMainActivity.this, _dataAppointment);
+                    responseModelAppointments.getData().remove(position);
+                    Utility.addPreferencesAppointmentsData(NavigationMainActivity.this, Constants.keySalonAppointmentsData, responseModelAppointments);
 
-                refreshAppointmentData();
+                    refreshAppointmentData();
 
-                seatImageViews = Utility.refreshSeats(this, llSeats, seatImageViews);
+                    seatImageViews = Utility.refreshSeats(this, llSeats, seatImageViews);
+                }
+            } else {
+                Utility.showToast(NavigationMainActivity.this, "No seat available");
             }
-
         }
 
 

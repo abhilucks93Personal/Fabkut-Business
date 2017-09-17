@@ -33,6 +33,7 @@ public class Constants {
     public static String keySalonCancelBookingData = "keySalonCancelBookingData";
     public static String keySalonTaxPercentage = "keySalonTaxPercentage";
     public static String keySalonPreviousBalance = "keySalonPreviousBalance";
+    public static String keySalonSeatsData = "keySalonSeatsData";
 
     public static String keySalonCloseTime = "keySalonCloseTime";
     public static String timeStartAfternoon = "12:00:00.0000000";
@@ -42,4 +43,6 @@ public class Constants {
 
     public static String msgBillingUnpaidAmountSync = "Unable to sync outstanding amount with the server.\nPlease check your Internet Connection or ask your customer to make full payment of this billing only.";
     public static String displayDateFormat = "MMM dd, yyyy";
+
+    public static String displayDateFormatWithTime = "MMM dd, yyyy/HH:mm";
 }

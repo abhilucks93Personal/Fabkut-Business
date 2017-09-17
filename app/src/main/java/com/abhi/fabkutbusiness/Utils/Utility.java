@@ -54,6 +54,8 @@ import com.abhi.fabkutbusiness.main.model.ResponseModelEmployeeData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelLogin;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfo;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfoData;
+import com.abhi.fabkutbusiness.main.model.ResponseModelSeats;
+import com.abhi.fabkutbusiness.main.model.ResponseModelSeatsData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -471,6 +473,25 @@ public class Utility {
         ResponseModelAppointments responseModelAppointments = gson.fromJson(json, ResponseModelAppointments.class);
 
         return responseModelAppointments;
+
+    }
+
+
+    public static void addPreferencesSeatsData(Context context, String key, ResponseModelSeats responseModelSeats) {
+        SharedPreferences.Editor editor = context.getSharedPreferences("Preferences_", Context.MODE_PRIVATE).edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(responseModelSeats);
+        editor.putString(key, json);
+        editor.commit();
+    }
+
+    public static ResponseModelSeats getResponseModelSeats(Context context, String key) {
+        SharedPreferences prefs = context.getSharedPreferences("Preferences_", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = prefs.getString(key, "");
+        ResponseModelSeats responseModelSeats = gson.fromJson(json, ResponseModelSeats.class);
+
+        return responseModelSeats;
 
     }
 
@@ -937,7 +958,7 @@ public class Utility {
             while (dif < dateCloseTime.getTime()) {
                 Date slot = new Date(dif);
 
-                SimpleDateFormat localDateFormat = new SimpleDateFormat("hh:mm");
+                SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
                 String time = localDateFormat.format(slot);
                 slots.add(time);
                 System.out.println("slot" + time);
@@ -971,7 +992,7 @@ public class Utility {
 
             for (int i = 0; i <= slotSelection; i++) {
                 Date slot = new Date(dif);
-                SimpleDateFormat localDateFormat = new SimpleDateFormat("hh:mm");
+                SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
                 String time = localDateFormat.format(slot);
 
                 if (bookedSlots.contains(date + "/" + time)) {
@@ -984,13 +1005,11 @@ public class Utility {
                 dif += (Constants.slotDifference * 60 * 1000);
             }
 
-
             return slots;
 
         } catch (ParseException e) {
             e.printStackTrace();
-            slots = new ArrayList<>();
-            return slots;
+            return null;
 
         }
     }
@@ -1037,7 +1056,7 @@ public class Utility {
 
             Date slot = new Date(_lastTime);
 
-            SimpleDateFormat localDateFormat = new SimpleDateFormat("hh:mm");
+            SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
             String lastTime = localDateFormat.format(slot);
 
             slotArray = lastTime.split("/");
@@ -1160,15 +1179,28 @@ public class Utility {
 
         if (seat >= 0) {
             seatStatusList.set(seat, "1");
-        }
-        Utility.addPreferencesSeatStatusData(activity, Constants.keySalonSeatsStatusList, seatStatusList);
 
-        ResponseModelAppointments responseModelBookings = Utility.getResponseModelBookings(activity, Constants.keySalonBookingData);
+            Utility.addPreferencesSeatStatusData(activity, Constants.keySalonSeatsStatusList, seatStatusList);
 
-        if (responseModelBookings != null) {
-            responseModelBookings.getData().add(data);
+
+            ResponseModelAppointments responseModelBookings = Utility.getResponseModelBookings(activity, Constants.keySalonBookingData);
+            if (responseModelBookings != null) {
+                responseModelBookings.getData().add(data);
+            }
+            Utility.addPreferencesBookingData(activity, Constants.keySalonBookingData, responseModelBookings);
+
+            ResponseModelSeats seatsData = Utility.getResponseModelSeats(activity, Constants.keySalonSeatsData);
+            if (seatsData.getData().get(seat) != null) {
+                seatsData.getData().get(seat).setBookingData(data);
+
+            }
+            Utility.addPreferencesSeatsData(activity, Constants.keySalonSeatsData, seatsData);
+
+
+        } else {
+            Utility.showToast(activity, "Sorry! Could not book");
         }
-        Utility.addPreferencesBookingData(activity, Constants.keySalonBookingData, responseModelBookings);
+
 
     }
 
@@ -1178,15 +1210,25 @@ public class Utility {
             int seat = Integer.parseInt(seatNum);
             if (seat >= 0) {
                 seatStatusList.set(seat, "0");
-            }
-            Utility.addPreferencesSeatStatusData(activity, Constants.keySalonSeatsStatusList, seatStatusList);
 
-            ResponseModelAppointments responseModelBookings = Utility.getResponseModelBookings(activity, Constants.keySalonBookingData);
+                Utility.addPreferencesSeatStatusData(activity, Constants.keySalonSeatsStatusList, seatStatusList);
 
-            if (responseModelBookings != null) {
-                responseModelBookings.getData().remove(dataPos);
+                ResponseModelAppointments responseModelBookings = Utility.getResponseModelBookings(activity, Constants.keySalonBookingData);
+                if (responseModelBookings != null) {
+
+                    ResponseModelSeats seatsData = Utility.getResponseModelSeats(activity, Constants.keySalonSeatsData);
+
+                    if (seatsData.getData().get(seat) != null) {
+                        seatsData.getData().get(seat).getSlots().removeAll(responseModelBookings.getData().get(dataPos).getSlots());
+                    }
+                    Utility.addPreferencesSeatsData(activity, Constants.keySalonSeatsData, seatsData);
+                    responseModelBookings.getData().remove(dataPos);
+                }
+                Utility.addPreferencesBookingData(activity, Constants.keySalonBookingData, responseModelBookings);
+
+            } else {
+                Utility.showToast(activity, "Sorry! Something went wrong in releasing respective seat.");
             }
-            Utility.addPreferencesBookingData(activity, Constants.keySalonBookingData, responseModelBookings);
         }
     }
 
@@ -1377,4 +1419,163 @@ public class Utility {
     }
 
 
+    public static boolean isSeatAvailable(Activity activity, String startSlot, String endSlot) {
+
+        ResponseModelSeats seatsData = Utility.getResponseModelSeats(activity, Constants.keySalonSeatsData);
+        if (seatsData.getData() != null) {
+
+            for (ResponseModelSeatsData data : seatsData.getData()) {
+
+                if (!(data.getSlots().contains(startSlot) || data.getSlots().contains(endSlot))) {
+                    return true;
+                }
+
+            }
+
+        }
+
+        return false;
+    }
+
+
+    public static int getAvailableSeat(Activity activity, String startSlot, String endSlot) {
+
+        ResponseModelSeats seatsData = Utility.getResponseModelSeats(activity, Constants.keySalonSeatsData);
+        if (seatsData.getData() != null) {
+
+            int index = 0;
+            for (ResponseModelSeatsData data : seatsData.getData()) {
+
+                if (!(data.getSlots().contains(startSlot) || data.getSlots().contains(endSlot))) {
+                    return index;
+                }
+
+                index++;
+            }
+
+        }
+
+        return -1;
+    }
+
+    public static boolean isCurrentBooking(String bookingDate) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.displayDateFormatWithTime);
+
+        String currDate = getCurrentDate(Constants.displayDateFormatWithTime);
+
+        try {
+            Date date_current = simpleDateFormat.parse(currDate);
+            Date date_booking = simpleDateFormat.parse(bookingDate);
+
+            // in milliseconds
+            long difference = date_booking.getTime() - date_current.getTime();
+
+            // in minutes
+            long minutes = difference / (1000 * 60);
+
+            if (minutes < 15)
+                return true;
+
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return false;
+    }
+
+    public static void updateSeatSlots(Activity activity, String seatNumber, ArrayList<String> slots) {
+
+        int seat = Integer.parseInt(seatNumber);
+        if (seat >= 0) {
+            ResponseModelSeats seatsData = Utility.getResponseModelSeats(activity, Constants.keySalonSeatsData);
+            if (seatsData.getData().get(seat) != null) {
+                seatsData.getData().get(seat).getSlots().addAll(slots);
+            }
+            Utility.addPreferencesSeatsData(activity, Constants.keySalonSeatsData, seatsData);
+        }
+
+    }
+
+    public static ArrayList<String> getElapsedSlots(Activity activity) {
+
+        String _openTime = Utility.getPreferences(activity, Constants.keySalonOpenTime);
+
+        ArrayList<String> slots = new ArrayList<>();
+        try {
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+            String currDate = getCurrentDate(Constants.displayDateFormat);
+            String openTime = getCurrentDate("dd/MM/yyyy") + " " + _openTime.split("\\.")[0];
+            Date dateOpenTime = sdf.parse(openTime);
+
+            String closeTime = getCurrentDate("dd/MM/yyyy HH:mm:ss");
+            Date dateCloseTime = sdf.parse(closeTime);
+
+            long dif = dateOpenTime.getTime();
+
+            while (dif < dateCloseTime.getTime()) {
+                Date slot = new Date(dif);
+
+                SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
+                String time = localDateFormat.format(slot);
+                slots.add(currDate + "/" + time);
+                System.out.println("slot" + time);
+                dif += (Constants.slotDifference * 60 * 1000);
+            }
+
+            slots.remove(slots.size() - 1);
+            return slots;
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            slots = new ArrayList<>();
+            return slots;
+
+        }
+    }
+
+    public static boolean checkSlot(Activity activity, ArrayList<String> slot) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.displayDateFormatWithTime);
+
+        String currDate = getCurrentDate(Constants.displayDateFormatWithTime);
+
+        try {
+            Date date_current = simpleDateFormat.parse(currDate);
+            Date date_booking_start = simpleDateFormat.parse(slot.get(0));
+            Date date_booking_end = simpleDateFormat.parse(slot.get(slot.size() - 1));
+
+            if (date_current.getTime() > date_booking_start.getTime() && date_current.getTime() < date_booking_end.getTime()) {
+                return true;
+            } else if (date_current.getTime() < date_booking_start.getTime()) {
+                Utility.showToast(activity, "Please wait till the booking time or Reschedule booking.");
+                return false;
+            } else {
+                Utility.showToast(activity, "Booking slot is expired. Please reschedule.");
+                return false;
+            }
+
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+
+    }
+
+    public static boolean isSeatAvailable(Activity activity, int seatNum) {
+
+
+        ArrayList<String> seatStatus = getSeatStatusData(activity, Constants.keySalonSeatsStatusList);
+
+        if (seatStatus.size() > seatNum && seatStatus.get(seatNum).equals("0")) {
+            return true;
+        }
+
+
+        return false;
+    }
 }

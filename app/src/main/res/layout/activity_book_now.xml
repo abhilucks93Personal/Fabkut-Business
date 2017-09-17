@@ -335,6 +335,108 @@
                             android:paddingBottom="@dimen/_6sdp"
                             android:paddingLeft="@dimen/_10sdp"
                             android:paddingTop="@dimen/_6sdp"
+                            android:text="Services"
+                            android:textAllCaps="true"
+                            android:textColor="#595A60"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/colorGrey25" />
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/rv_services"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:background="@color/colorWhite"
+                            android:divider="@null"
+                            android:orientation="vertical"
+                            android:paddingBottom="@dimen/_6sdp"
+                            android:paddingTop="@dimen/_6sdp"
+                            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/colorGrey25" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/colorWhite">
+
+                            <TextView
+                                android:id="@+id/tv_select_service"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/_14sdp"
+                                android:background="@drawable/layout_bg9"
+                                android:gravity="center"
+                                android:padding="@dimen/_10sdp"
+                                android:text="Select Services"
+                                android:textColor="@color/colorWhite"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/colorGrey25" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/colorWhite"
+                            android:orientation="horizontal"
+                            android:paddingBottom="@dimen/_6sdp"
+                            android:paddingLeft="@dimen/_10sdp"
+                            android:paddingRight="@dimen/_10sdp"
+                            android:paddingTop="@dimen/_6sdp">
+
+                            <TextView
+                                android:id="@+id/tv_total"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textColor="@color/colorGreen"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tv_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text=""
+                                android:textColor="@color/colorGreen"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/colorGrey25" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="@dimen/_6sdp"
+                            android:background="@color/colorGrey25" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#E5E5E5"
+                            android:paddingBottom="@dimen/_6sdp"
+                            android:paddingLeft="@dimen/_10sdp"
+                            android:paddingTop="@dimen/_6sdp"
                             android:text="Select Stylist"
                             android:textAllCaps="true"
                             android:textColor="#595A60"
@@ -431,112 +533,10 @@
                             android:orientation="horizontal"
                             app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
 
-
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/_8sdp"
                             android:background="@color/colorBackground" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/colorGrey25" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="#E5E5E5"
-                            android:paddingBottom="@dimen/_6sdp"
-                            android:paddingLeft="@dimen/_10sdp"
-                            android:paddingTop="@dimen/_6sdp"
-                            android:text="Services"
-                            android:textAllCaps="true"
-                            android:textColor="#595A60"
-                            android:textStyle="bold" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/colorGrey25" />
-
-                        <android.support.v7.widget.RecyclerView
-                            android:id="@+id/rv_services"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:background="@color/colorWhite"
-                            android:divider="@null"
-                            android:orientation="vertical"
-                            android:paddingBottom="@dimen/_6sdp"
-                            android:paddingTop="@dimen/_6sdp"
-                            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
-
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/colorGrey25" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/colorWhite">
-
-                            <TextView
-                                android:id="@+id/tv_select_service"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_margin="@dimen/_14sdp"
-                                android:background="@drawable/layout_bg9"
-                                android:gravity="center"
-                                android:padding="@dimen/_10sdp"
-                                android:text="Select Services"
-                                android:textColor="@color/colorWhite"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/colorGrey25" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/colorWhite"
-                            android:orientation="horizontal"
-                            android:paddingBottom="@dimen/_6sdp"
-                            android:paddingLeft="@dimen/_10sdp"
-                            android:paddingRight="@dimen/_10sdp"
-                            android:paddingTop="@dimen/_6sdp">
-
-                            <TextView
-                                android:id="@+id/tv_total"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text=""
-                                android:textColor="@color/colorGreen"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tv_time"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="right"
-                                android:text=""
-                                android:textColor="@color/colorGreen"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginTop="@dimen/_6sdp"
-                            android:background="@color/colorGrey25" />
 
 
                     </LinearLayout>
