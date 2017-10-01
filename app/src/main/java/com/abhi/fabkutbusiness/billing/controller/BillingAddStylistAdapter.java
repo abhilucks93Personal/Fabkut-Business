@@ -43,7 +43,8 @@ public class BillingAddStylistAdapter extends RecyclerView.Adapter<BillingAddSty
             ivProfileImage = (CircleImageView) view.findViewById(R.id.iv_stylist_image);
             ivTick = (ImageView) view.findViewById(R.id.iv_stylist_tick);
             tvName = (TextView) view.findViewById(R.id.tv_stylist_name);
-            selectedIndex = 0;
+
+
         }
     }
 
@@ -51,6 +52,8 @@ public class BillingAddStylistAdapter extends RecyclerView.Adapter<BillingAddSty
     public BillingAddStylistAdapter(List<ResponseModelEmployeeData> employeesDataList, Activity context) {
         this.employeesDataList = employeesDataList;
         this.context = context;
+        selectedIndex = 0;
+        selectedEmpId = employeesDataList.get(0).getEmp_id();
     }
 
     @Override

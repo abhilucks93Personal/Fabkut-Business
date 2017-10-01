@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,13 +25,16 @@ import java.util.ArrayList;
  * Created by abhi on 17/04/17.
  */
 
-public class SelectServiceActivity extends AppCompatActivity implements View.OnClickListener {
+public class SelectServiceActivity extends AppCompatActivity implements View.OnClickListener, TextWatcher {
 
     View actionBarView;
     TextView tvTitle, tvRight;
     ImageView iconLeft, iconRight;
     RecyclerView rvServices;
     ServicesAdapter mAdapter;
+    EditText etSearch;
+    ArrayList<ResponseModelRateInfoData> searchedData;
+    ArrayList<ResponseModelRateInfoData> rateData;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,15 +49,15 @@ public class SelectServiceActivity extends AppCompatActivity implements View.OnC
     }
 
     private void initUi() {
-
-        ArrayList<ResponseModelRateInfoData> data = Utility.getResponseModelRateInfo(this, Constants.keySalonRateInfoData).getData();
-
+        searchedData = new ArrayList<>();
+        rateData = Utility.getResponseModelRateInfo(this, Constants.keySalonRateInfoData).getData();
+        searchedData.addAll(rateData);
         ArrayList<ResponseModelRateInfoData> selectedData = getIntent().getParcelableArrayListExtra("data");
 
         if (selectedData == null)
             selectedData = new ArrayList<>();
 
-        mAdapter = new ServicesAdapter(data, selectedData, R.layout.item_service_list, false, this);
+        mAdapter = new ServicesAdapter(searchedData, selectedData, R.layout.item_service_list, false, this);
         rvServices.setAdapter(mAdapter);
     }
 
@@ -71,6 +77,9 @@ public class SelectServiceActivity extends AppCompatActivity implements View.OnC
         tvRight.setTextColor(getResources().getColor(R.color.colorGreen));
         tvRight.setText("DONE");
         tvRight.setOnClickListener(this);
+
+        etSearch = (EditText) findViewById(R.id.et_search);
+        etSearch.addTextChangedListener(this);
 
         rvServices = (RecyclerView) findViewById(R.id.rv_services);
 
@@ -102,5 +111,30 @@ public class SelectServiceActivity extends AppCompatActivity implements View.OnC
                 finish();
                 break;
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        searchedData.clear();
+        if (s.toString().length() > 0) {
+            for (ResponseModelRateInfoData data : rateData) {
+                if (data.getSub_service_name().toLowerCase().contains(s.toString().toLowerCase())) {
+                    searchedData.add(data);
+                }
+            }
+        } else {
+            searchedData.addAll(rateData);
+        }
+        mAdapter.notifyDataSetChanged();
     }
 }

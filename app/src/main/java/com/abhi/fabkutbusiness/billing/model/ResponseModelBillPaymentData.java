@@ -80,6 +80,10 @@ public class ResponseModelBillPaymentData {
     }
 
     public String getPaid() {
+        if (paid == null)
+            paid = "0";
+        else if (paid == "")
+            paid = "0";
         return paid;
     }
 

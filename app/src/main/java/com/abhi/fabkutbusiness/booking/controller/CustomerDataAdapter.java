@@ -69,7 +69,7 @@ public class CustomerDataAdapter extends ArrayAdapter<ResponseModelCustomerData>
 
                     activity.startActivity(new Intent(activity, BookNowActivity.class)
                             .putExtra("data", responseModelCustomerData)
-                            .putExtra("seatNum", seatNum));
+                            .putExtra("isEdit", false));
                     //    ((BookNowActivity) mContext).setData(responseModelCustomerData);
 
                 }

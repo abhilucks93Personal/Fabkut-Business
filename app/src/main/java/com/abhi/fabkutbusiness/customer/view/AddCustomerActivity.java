@@ -126,7 +126,7 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
 
             String seatNum = Utility.getEmptySeatNum(this);
 
-           startActivity(new Intent(AddCustomerActivity.this, BookNowActivity.class)
+            startActivity(new Intent(AddCustomerActivity.this, BookNowActivity.class)
                     .putExtra("data", responseModelCustomerData)
                     .putExtra("seatNum", seatNum));
 
@@ -139,6 +139,23 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
     }
 
     private boolean isValidated(String strFirstName, String strLastName, String strEmail, String strMobile, String strAllergies, String strGender) {
+
+        if (strFirstName.length() == 0) {
+            Utility.showToast(this, "Please enter the First Name.");
+            return false;
+        }
+
+        if (!Utility.isValidEmail(strEmail)) {
+            Utility.showToast(this, "Please enter the valid email.");
+            return false;
+        }
+
+        if (strMobile.length() <10) {
+            Utility.showToast(this, "Please enter the valid Mobile number");
+            return false;
+        }
+
+
         return true;
     }
 }

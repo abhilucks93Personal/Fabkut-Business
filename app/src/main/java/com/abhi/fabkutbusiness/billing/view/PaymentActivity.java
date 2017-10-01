@@ -36,13 +36,14 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     TextView tvTitle;
     ImageView iconLeft;
     EditText etPrice, etPaid, etUnpaid, etRemark;
-    CheckBox cbWaved;
+    CheckBox cbWaved, cbInvoice;
     ResponseModelAppointmentsData data;
     int total;
     int unpaidAmount = 0;
     int paidAmount = 0;
     TextView tvSubmit;
     int billingItemPos;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,8 +62,6 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         total = getIntent().getIntExtra("total", 0);
         billingItemPos = getIntent().getIntExtra("pos", -1);
         etPrice.setText("" + total);
-
-
         etUnpaid.setText("0");
     }
 
@@ -83,6 +82,8 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         etUnpaid = (EditText) findViewById(R.id.et_unpaid);
         cbWaved = (CheckBox) findViewById(R.id.cb_waved);
         cbWaved.setOnCheckedChangeListener(this);
+        cbInvoice = (CheckBox) findViewById(R.id.cb_invoice);
+
         etRemark = (EditText) findViewById(R.id.et_remark);
 
         tvSubmit = (TextView) findViewById(R.id.tv_submit);
@@ -109,7 +110,10 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case R.id.tv_submit:
-                fetchData();
+                if (etPaid.getText().length() > 0)
+                    fetchData();
+                else
+                    Utility.showToast(PaymentActivity.this, "Please enter the paid amount.");
                 break;
         }
     }
@@ -160,8 +164,14 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         Utility.releaseEmployeeSelectedSlots(this, data.getEmployee().getEmp_id(), data.getSlots());
         Utility.setTotalRevenue(this, data.getCustomerId(), paidAmount);
         Utility.setTotalVisits(this, data.getCustomerId());
-        startActivityForResult(new Intent(this, InvoiceActivity.class)
-                .putExtra("data", data), 101);
+        Utility.updateBillingListData(this, data);
+        if (cbInvoice.isChecked())
+            startActivityForResult(new Intent(this, InvoiceActivity.class)
+                    .putExtra("data", data), 101);
+        else {
+            setResult(RESULT_OK);
+            finish();
+        }
     }
 
     private void showAlertDialog(String msg) {

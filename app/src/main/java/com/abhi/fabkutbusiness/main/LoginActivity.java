@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.abhi.fabkutbusiness.R;
 import com.abhi.fabkutbusiness.Utils.Constants;
 import com.abhi.fabkutbusiness.Utils.Utility;
+import com.abhi.fabkutbusiness.billing.model.ResponseModelBillingList;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointments;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointmentsData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomer;
@@ -170,6 +171,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Utility.addPreferencesCancelBookingData(LoginActivity.this, Constants.keySalonCancelBookingData, responseModelAppointments);
                 Utility.addPreferencesSeatsData(LoginActivity.this, Constants.keySalonSeatsData, responseModelSeats);
 
+                ResponseModelBillingList responseModelBillingList = new ResponseModelBillingList();
+                Utility.addPreferencesBillingListData(LoginActivity.this, Constants.keySalonBillingListData, responseModelBillingList);
+
                 RetrofitApi.getInstance().customerApiMethod(this, this, businessId);
 
             } else {
@@ -214,6 +218,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 callRollback(modelRateInfo.getMESSAGE());
             }
         }
+    }
+
+    @Override
+    public void _onNext1(Object obj) {
+
     }
 
     private void callRollback(String msg) {

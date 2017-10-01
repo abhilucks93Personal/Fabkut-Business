@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -41,7 +42,7 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
     View actionBarView;
     TextView tvTitle;
     ImageView iconLeft;
-    LinearLayout llMain;
+    LinearLayout llMain, llDetails;
     TextView tvName, tvEmail, tvGender, tvMobile, tvTotalVisits, tvTotalRevenue, tvDesc, tvBookNow;
     ResponseModelAppointmentsData dataAppointment = new ResponseModelAppointmentsData();
     String seatNum;
@@ -59,6 +60,9 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
     ArrayList<String> bookedSlots = new ArrayList<>();
     TextView tvDate;
     private String currentDate;
+    ResponseModelAppointmentsData previousAppointmentData;
+    int reschedulePos;
+    boolean isEdit;
 
 
     @Override
@@ -75,32 +79,85 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
 
     private void initData() {
 
+        isEdit = getIntent().getBooleanExtra("isEdit", false);
 
-        ResponseModelCustomerData responseModelCustomerData = (ResponseModelCustomerData) getIntent().getSerializableExtra("data");
-        setData(responseModelCustomerData);
+        if (isEdit) {
+            previousAppointmentData = getIntent().getParcelableExtra("data");
+            reschedulePos = getIntent().getIntExtra("pos", -1);
+            setEditData(previousAppointmentData);
+            tvDate.setText(currentDate);
+            rateInfoDatas = new ArrayList<>();
+            rateInfoDatas.addAll(previousAppointmentData.getServices());
 
-        rateInfoDatas = new ArrayList<>();
-        mAdapterServices = new ServicesAdapter(rateInfoDatas, new ArrayList<ResponseModelRateInfoData>(), R.layout.item_selected_service_list, true, this);
-        rvServices.setAdapter(mAdapterServices);
+        } else {
+            ResponseModelCustomerData responseModelCustomerData = (ResponseModelCustomerData) getIntent().getSerializableExtra("data");
+            setData(responseModelCustomerData);
+            tvDate.setText(currentDate);
+            rateInfoDatas = new ArrayList<>();
+
+        }
 
         currentDate = Utility.getCurrentDate(Constants.displayDateFormat);
         tvDate.setText(currentDate);
+
+        mAdapterServices = new ServicesAdapter(rateInfoDatas, new ArrayList<ResponseModelRateInfoData>(), R.layout.item_selected_service_list, true, this);
+        rvServices.setAdapter(mAdapterServices);
+
 
         slots = new ArrayList<>();
         ArrayList<String> selectedSlots = new ArrayList<>();
 
         elapsedSlots = Utility.getElapsedSlots(this);
+        if (elapsedSlots.size() == 0) {
+            Utility.showToast(this, "Sorry! Can't book services after closing time.");
 
+        }
 
-        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots,elapsedSlots, selectedSlots, bookedSlots, false, currentDate);
+        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, elapsedSlots, selectedSlots, bookedSlots, false, currentDate);
         rvSlots.setAdapter(mAdapterSlots);
-        tvMorning.performClick();
+
+        initSlotUi();
 
         ArrayList<ResponseModelEmployeeData> employeeDatas = Utility.getResponseModelEmployee(this, Constants.keySalonEmployeeData).getData();
         mAdapterStylist = new StylistAdapter(employeeDatas, this);
         rvStylist.setAdapter(mAdapterStylist);
 
-        setServiceTotal(0, 0);
+
+        setServiceTotal(totalCost, totalTime);
+
+    }
+
+    private void initSlotUi() {
+        String openTime = Utility.getPreferences(BookNowActivity.this, Constants.keySalonOpenTime);
+        ArrayList<String> morningSlots = Utility.getFormattedTimeSlots(openTime, Constants.timeStartAfternoon, Constants.displayDateFormatWithTime);
+
+        if (elapsedSlots.containsAll(morningSlots)) {
+
+            tvMorning.setTextColor(getResources().getColor(R.color.colorGrey));
+            tvMorning.setEnabled(false);
+
+            ArrayList<String> afternoonSlots = Utility.getFormattedTimeSlots(Constants.timeStartAfternoon, Constants.timeEndAfternoon, Constants.displayDateFormatWithTime);
+
+            if (elapsedSlots.containsAll(afternoonSlots)) {
+
+                tvAfternoon.setTextColor(getResources().getColor(R.color.colorGrey));
+                tvAfternoon.setEnabled(false);
+                String closeTime = Utility.getPreferences(BookNowActivity.this, Constants.keySalonCloseTime);
+                ArrayList<String> eveningSlots = Utility.getFormattedTimeSlots(Constants.timeEndAfternoon, closeTime, Constants.displayDateFormatWithTime);
+
+                if (elapsedSlots.containsAll(eveningSlots)) {
+                    tvEvening.setTextColor(getResources().getColor(R.color.colorGrey));
+                    tvEvening.setEnabled(false);
+                } else {
+                    tvEvening.performClick();
+                }
+            } else {
+                tvAfternoon.performClick();
+            }
+
+        } else {
+            tvMorning.performClick();
+        }
     }
 
     private void findViewById() {
@@ -114,7 +171,7 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         iconLeft.setOnClickListener(this);
 
         llMain = (LinearLayout) findViewById(R.id.book_now_ll_main);
-
+        llDetails = (LinearLayout) findViewById(R.id.book_now_ll_details);
 
         tvName = (TextView) findViewById(R.id.tv_name);
         tvEmail = (TextView) findViewById(R.id.tv_email);
@@ -184,11 +241,26 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
                     seatNum = String.valueOf(Utility.getAvailableSeat(BookNowActivity.this, dataAppointment.getSlots().get(0), dataAppointment.getSlots().get(dataAppointment.getSlots().size() - 1)));
                     dataAppointment.setSeatNumber(seatNum);
 
-
                     for (ResponseModelRateInfoData rateData : dataAppointment.getServices()) {
                         rateData.setEmployee_name(dataAppointment.getEmployee().getEmp_name());
                         rateData.setEmployee_id(dataAppointment.getEmployee().getEmp_id());
                     }
+
+                    ResponseModelAppointments responseModelAppointments = Utility.getResponseModelAppointments(BookNowActivity.this, Constants.keySalonAppointmentsData);
+
+                    // remove values
+                    if (isEdit) {
+                        Utility.releaseEmployeeSelectedSlots(this, previousAppointmentData.getEmployee().getEmp_id(), previousAppointmentData.getSlots());
+                        Utility.releaseSeatReschedule(this, previousAppointmentData.getSeatNumber(), previousAppointmentData.getSlots());
+
+                        if (responseModelAppointments != null) {
+                            if (reschedulePos >= 0) {
+                                responseModelAppointments.getData().remove(reschedulePos);
+                            }
+
+                        }
+                    }
+
 
                     if (Utility.isCurrentBooking(mAdapterSlots.getSelectedSlotList().get(0))) {
 
@@ -199,13 +271,14 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
 
                     } else {
                         dataAppointment.setBookingStatus(Constants.BOOKING_STATUS_WAITING);
-                        ResponseModelAppointments responseModelAppointments = Utility.getResponseModelAppointments(BookNowActivity.this, Constants.keySalonAppointmentsData);
 
                         if (responseModelAppointments != null) {
                             responseModelAppointments.getData().add(dataAppointment);
                         }
-                        Utility.addPreferencesAppointmentsData(BookNowActivity.this, Constants.keySalonAppointmentsData, responseModelAppointments);
+
                     }
+
+                    Utility.addPreferencesAppointmentsData(BookNowActivity.this, Constants.keySalonAppointmentsData, responseModelAppointments);
 
                     Utility.setEmployeeSelectedSlots(BookNowActivity.this, dataAppointment.getEmployee().getEmp_id(), dataAppointment.getSlots());
 
@@ -355,7 +428,7 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
 
     public void setData(ResponseModelCustomerData responseModelCustomerData) {
         llMain.setVisibility(View.VISIBLE);
-
+        llDetails.setVisibility(View.VISIBLE);
 
         tvName.setText(responseModelCustomerData.getEndUser_FirstName() + " " + responseModelCustomerData.getEndUser_LastName());
         tvMobile.setText(responseModelCustomerData.getContact_no());
@@ -375,6 +448,26 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         dataAppointment.setBookingType(Constants.BOOKING_TYPE_OFFLINE);
         dataAppointment.setCustomerMobile(responseModelCustomerData.getContact_no());
 
+        totalCost = 0;
+        totalTime = 0;
+
+    }
+
+    public void setEditData(ResponseModelAppointmentsData responseModelAppointmentsData) {
+        llMain.setVisibility(View.VISIBLE);
+        llDetails.setVisibility(View.GONE);
+
+        dataAppointment = new ResponseModelAppointmentsData();
+        dataAppointment.setCustomerId(responseModelAppointmentsData.getCustomerId());
+        dataAppointment.setBookingId(responseModelAppointmentsData.getBookingId());
+        dataAppointment.setCustomerEndUser_FirstName(responseModelAppointmentsData.getCustomerEndUser_FirstName());
+        dataAppointment.setCustomerEndUser_LastName(responseModelAppointmentsData.getCustomerEndUser_LastName());
+        dataAppointment.setBookingType(responseModelAppointmentsData.getBookingType());
+        dataAppointment.setCustomerMobile(responseModelAppointmentsData.getCustomerMobile());
+        dataAppointment.setServices(responseModelAppointmentsData.getServices());
+
+        totalCost = Integer.parseInt(responseModelAppointmentsData.getTotalAmount());
+        totalTime = Integer.parseInt(responseModelAppointmentsData.getTotalTime());
 
     }
 

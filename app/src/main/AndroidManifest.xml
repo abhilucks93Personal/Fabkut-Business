@@ -8,9 +8,9 @@
     <application
         android:name="com.abhi.fabkutbusiness.app.App"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/fab_mono"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/fab_mono"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
@@ -89,6 +89,17 @@
             android:name=".customer.view.AddCustomerActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".crm.view.CrmList"
+            android:label="Crm"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <activity
+            android:name=".crm.view.CrmTab"
+            android:label="crm"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
 
 
         <!-- _________________________________Tag_Accounting_________________________________ -->

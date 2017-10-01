@@ -60,6 +60,8 @@ public class ResponseModelAppointmentsData implements Parcelable {
 
     private ResponseModelBillPaymentData billPayment;
 
+    private ArrayList<String> serviceTrackRecord;
+
     public ResponseModelAppointmentsData() {
     }
 
@@ -86,6 +88,7 @@ public class ResponseModelAppointmentsData implements Parcelable {
         seatNumber = in.readString();
         services = in.createTypedArrayList(ResponseModelRateInfoData.CREATOR);
         slots = in.createStringArrayList();
+        serviceTrackRecord = in.createStringArrayList();
         employee = in.readParcelable(ResponseModelEmployeeData.class.getClassLoader());
     }
 
@@ -112,6 +115,7 @@ public class ResponseModelAppointmentsData implements Parcelable {
         dest.writeString(seatNumber);
         dest.writeTypedList(services);
         dest.writeStringList(slots);
+        dest.writeStringList(serviceTrackRecord);
         dest.writeParcelable(employee, flags);
     }
 
@@ -320,5 +324,13 @@ public class ResponseModelAppointmentsData implements Parcelable {
         this.billPayment = billPayment;
     }
 
+    public ArrayList<String> getServiceTrackRecord() {
+        if (serviceTrackRecord == null)
+            serviceTrackRecord = new ArrayList<>();
+        return serviceTrackRecord;
+    }
 
+    public void setServiceTrackRecord(ArrayList<String> serviceTrackRecord) {
+        this.serviceTrackRecord = serviceTrackRecord;
+    }
 }

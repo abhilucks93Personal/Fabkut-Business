@@ -5,12 +5,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.abhi.fabkutbusiness.R;
 import com.abhi.fabkutbusiness.booking.view.EditBookingServiceActivity;
 import com.abhi.fabkutbusiness.booking.view.BookNowActivity;
+import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfoData;
 
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ public class ServicesAdapter extends RecyclerView.Adapter<ServicesAdapter.MyView
 
     private Activity context;
     private List<ResponseModelRateInfoData> rateDataList;
+    private List<ResponseModelRateInfoData> searchedRateDataList;
     private ArrayList<ResponseModelRateInfoData> selectedRateDataList;
     private int mLayoutResourceId;
     private Boolean isSelectedLayout;
@@ -29,6 +32,13 @@ public class ServicesAdapter extends RecyclerView.Adapter<ServicesAdapter.MyView
     public ArrayList<ResponseModelRateInfoData> getSelectedRateDataList() {
         return selectedRateDataList;
     }
+
+    public void filterData(ArrayList<ResponseModelRateInfoData> searchedData) {
+        rateDataList.clear();
+        rateDataList.addAll(searchedData);
+        notifyDataSetChanged();
+    }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvPrice;

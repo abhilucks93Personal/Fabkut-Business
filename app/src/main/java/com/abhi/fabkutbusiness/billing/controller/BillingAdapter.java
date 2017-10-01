@@ -23,7 +23,7 @@ public class BillingAdapter extends ArrayAdapter<ResponseModelAppointmentsData> 
     Context context;
 
     private static class ViewHolder {
-        TextView name, status, time, num, billNow;
+        TextView name, status, time, num, billNow, employee;
 
     }
 
@@ -44,6 +44,7 @@ public class BillingAdapter extends ArrayAdapter<ResponseModelAppointmentsData> 
             viewHolder.status = (TextView) convertView.findViewById(R.id.tv_status);
             viewHolder.time = (TextView) convertView.findViewById(R.id.tv_time);
             viewHolder.num = (TextView) convertView.findViewById(R.id.tv_num);
+            viewHolder.employee = (TextView) convertView.findViewById(R.id.tv_employee);
             viewHolder.billNow = (TextView) convertView.findViewById(R.id.tv_bill_now);
             convertView.setTag(viewHolder);
         } else {
@@ -56,6 +57,7 @@ public class BillingAdapter extends ArrayAdapter<ResponseModelAppointmentsData> 
         viewHolder.status.setText(" (" + Utility.getBookingTypeText(billingData.getBookingType()) + ") ");
         viewHolder.time.setText("" + Utility.getFormattedSlotTime(billingData.getSlots(), billingData.getBookingDate()) + " ");
         viewHolder.num.setText("" + billingData.getCustomerMobile() + " ");
+        viewHolder.employee.setText("" + billingData.getEmployee().getEmp_name() + " ");
 
         viewHolder.billNow.setOnClickListener(new View.OnClickListener() {
             @Override

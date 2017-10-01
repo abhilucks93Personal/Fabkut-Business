@@ -1,6 +1,13 @@
 package com.abhi.fabkutbusiness.retrofit;
 
 
+import com.abhi.fabkutbusiness.crm.model.ResponseBasicInfo;
+import com.abhi.fabkutbusiness.crm.model.ResponseBasicInfoUpdate;
+import com.abhi.fabkutbusiness.crm.model.ResponseCrmList;
+import com.abhi.fabkutbusiness.crm.model.ResponsePersonalInfo;
+import com.abhi.fabkutbusiness.crm.model.ResponsePersonalInfoUpdate;
+import com.abhi.fabkutbusiness.crm.model.ResponseSocialInfo;
+import com.abhi.fabkutbusiness.crm.model.ResponseSocialInfoUpdate;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomer;
 import com.abhi.fabkutbusiness.main.model.ResponseModelEmployee;
 import com.abhi.fabkutbusiness.main.model.ResponseModelLogin;
@@ -16,18 +23,40 @@ import rx.Observable;
 public interface AppRequestService {
 
 
-    @POST("booking/index.php?tag=salonlogin")
+    @POST("salon/booking/index.php?tag=salonlogin")
     Observable<ResponseModelLogin> loginApiMethod(@Query("email") String user, @Query("password") String pass);
 
-    @POST("booking/index.php?tag=customer")
+    @POST("salon/booking/index.php?tag=customer")
     Observable<ResponseModelCustomer> customerApiMethod(@Query("business_id") String business_id);
 
-    @POST("booking/index.php?tag=salonemp")
+    @POST("salon/booking/index.php?tag=salonemp")
     Observable<ResponseModelEmployee> employeeApiMethod(@Query("business_id") String business_id);
 
-    @POST("booking/index.php?tag=rateinfo")
+    @POST("salon/booking/index.php?tag=rateinfo")
     Observable<ResponseModelRateInfo> rateInfoApiMethod(@Query("business_id") String business_id);
 
+
+
+    @POST("crm/index.php?tag=cstList")
+    Observable<ResponseCrmList>CrmListShowApiMethod(@Query("business_id") int business_id);
+
+    @POST("crm/index.php?tag=cstbasic")
+    Observable<ResponseBasicInfo>CrmBasicInfoShowApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int Enduser_id);
+
+    @POST("crm/index.php?tag=cstsocial")
+    Observable<ResponseSocialInfo>CrmSocialInfoShowApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int Enduser_id);
+
+    @POST("crm/index.php?tag=cstpersonal")
+    Observable<ResponsePersonalInfo>CrmPersonalInfoShowApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int Enduser_id);
+
+    @POST("crm/index.php?tag=cstbasicUP")
+    Observable<ResponseBasicInfoUpdate> CrmBasicInfoUpdateApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int EndUser_id, @Query("enduser_name") String enduser_name, @Query("lname") String lname, @Query("gender") String gender, @Query("email") String email, @Query("contact_no") String contact_no, @Query("alternetContact") String alternetContact, @Query("allergies") String allergies, @Query("Profile_Comp_Basic") int Profile_Comp_Basic);
+
+    @POST("crm/index.php?tag=cstPerUP")
+    Observable<ResponsePersonalInfoUpdate>CrmPersonalInfoUpdateApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int EndUser_id, @Query("dob") String dob, @Query("anidate") String anidate, @Query("m_um") int m_um, @Query("Profile_Comp_Personal") int Profile_Comp_Personal);
+
+    @POST("crm/index.php?tag=cstsocialUP")
+    Observable<ResponseSocialInfoUpdate> CrmSocialInfoUpdateApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int EndUser_id, @Query("Social_Home_address") String Social_Home_address, @Query("Social_Delivery_Address") String Social_Delivery_Address, @Query("Social_Mode_Commincation") String Social_Mode_Commincation , @Query("Social_FB_ID") String Social_FB_ID, @Query("Social_Twitter_ID") String Social_Twitter_ID, @Query("Social_whatsApp") String Social_whatsApp, @Query("Profile_Comp_Social") int Profile_Comp_Social );
 
 
 

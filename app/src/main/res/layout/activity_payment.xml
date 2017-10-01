@@ -97,9 +97,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_8sdp"
+            android:buttonTint="@color/colorGrey"
             android:text="Is waved off"
-            android:textColor="@color/colorDarkGrey"
-            app:buttonTint="@color/colorGrey" />
+            android:textColor="@color/colorDarkGrey" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -156,6 +156,17 @@
 
 
         </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/cb_invoice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:buttonTint="@color/colorGrey"
+            android:text="Print Invoice"
+            android:textColor="@color/colorDarkGrey"
+            android:textSize="@dimen/_8sdp" />
+
 
         <TextView
             android:id="@+id/tv_submit"

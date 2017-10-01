@@ -30,7 +30,9 @@ import com.abhi.fabkutbusiness.Utils.Utility;
 import com.abhi.fabkutbusiness.accounting.view.AccountingActivity;
 import com.abhi.fabkutbusiness.billing.view.BillNowActivity;
 import com.abhi.fabkutbusiness.booking.controller.CustomerDataAdapter;
+import com.abhi.fabkutbusiness.booking.view.BookNowActivity;
 import com.abhi.fabkutbusiness.booking.view.EditBookingServiceActivity;
+import com.abhi.fabkutbusiness.crm.view.CrmList;
 import com.abhi.fabkutbusiness.customer.view.AddCustomerActivity;
 import com.abhi.fabkutbusiness.main.controller.AppointmentsAdapter;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointments;
@@ -54,7 +56,7 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
     ImageView ivAppointments;
     ListView listAppointments;
     ArrayList<ResponseModelAppointmentsData> appointmentsData = new ArrayList<>();
-    TextView tvAccounting, tvInventory;
+    TextView tvAccounting, tvInventory,tvCrm;
     private AppointmentsAdapter adapter;
     private ArrayList<ImageView> seatImageViews;
     private LinearLayout llSeats;
@@ -62,6 +64,7 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
     AutoCompleteTextView actSearch;
     CustomerDataAdapter customerDataAdapter;
     private ArrayList<ResponseModelCustomerData> data;
+    TextView tvTotalSale, tvTotalServices;
 
     @Override
     protected void onResume() {
@@ -72,6 +75,10 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
         seatImageViews = Utility.refreshSeats(this, llSeats, seatImageViews);
 
+        tvTotalSale.setText(Utility.getTotalSale(NavigationMainActivity.this));
+        tvTotalServices.setText(Utility.getTotalService(NavigationMainActivity.this));
+
+        data.clear();
         data.addAll(Utility.getResponseModelCustomer(this, Constants.keySalonCustomerData).getData());
         customerDataAdapter.notifyDataSetChanged();
     }
@@ -135,6 +142,12 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
         tvAccounting = (TextView) findViewById(R.id.tv_accounting);
         tvAccounting.setOnClickListener(this);
+
+        tvCrm = (TextView) findViewById(R.id.tv_crm);
+        tvCrm.setOnClickListener(this);
+
+        tvTotalSale = (TextView) findViewById(R.id.tv_total_sale);
+        tvTotalServices = (TextView) findViewById(R.id.tv_total_services);
 
         listAppointments = (ListView) findViewById(R.id.list_appointments);
 
@@ -374,6 +387,11 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
                 break;
 
+            case R.id.tv_crm:
+                startActivity(new Intent(NavigationMainActivity.this, CrmList.class));
+
+                break;
+
 
         }
     }
@@ -389,7 +407,7 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
                 if (resultCode == RESULT_OK) {
 
-                    ResponseModelAppointmentsData _dataAppointment = data.getParcelableExtra("data");
+                  /*  ResponseModelAppointmentsData _dataAppointment = data.getParcelableExtra("data");
 
                     ResponseModelAppointments responseModelAppointments = Utility.getResponseModelAppointments(NavigationMainActivity.this, Constants.keySalonAppointmentsData);
 
@@ -398,7 +416,7 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
                         responseModelAppointments.getData().set(reschedulePos, _dataAppointment);
                         Utility.addPreferencesAppointmentsData(NavigationMainActivity.this, Constants.keySalonAppointmentsData, responseModelAppointments);
                     }
-
+*/
 
                 }
 
@@ -430,8 +448,6 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
                 Utility.showToast(NavigationMainActivity.this, "No seat available");
             }
         }
-
-
     }
 
     public void rescheduleWaitingCustomer(int position) {
@@ -442,12 +458,15 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
         if (responseModelAppointments != null) {
 
-            ResponseModelAppointmentsData _dataAppointment = responseModelAppointments.getData().get(position);
+            startActivity(new Intent(NavigationMainActivity.this, BookNowActivity.class)
+                    .putExtra("data", responseModelAppointments.getData().get(position))
+                    .putExtra("isEdit", true)
+                    .putExtra("pos", reschedulePos));
 
-            startActivityForResult(new Intent(NavigationMainActivity.this, EditBookingServiceActivity.class)
-                    .putExtra("data", _dataAppointment)
-                    .putExtra("isEdit", true), 201);
-
+          /*  startActivityForResult(new Intent(NavigationMainActivity.this, EditBookingServiceActivity.class)
+                    .putExtra("data", responseModelAppointments.getData().get(position))
+                    .putExtra("pos", reschedulePos), 201);
+*/
         }
     }
 }

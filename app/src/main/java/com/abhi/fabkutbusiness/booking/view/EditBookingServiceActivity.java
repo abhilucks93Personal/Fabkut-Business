@@ -16,6 +16,8 @@ import com.abhi.fabkutbusiness.Utils.Utility;
 import com.abhi.fabkutbusiness.booking.controller.ServicesAdapter;
 import com.abhi.fabkutbusiness.booking.controller.SlotAdapter;
 import com.abhi.fabkutbusiness.booking.controller.StylistAdapter;
+import com.abhi.fabkutbusiness.main.NavigationMainActivity;
+import com.abhi.fabkutbusiness.main.model.ResponseModelAppointments;
 import com.abhi.fabkutbusiness.main.model.ResponseModelAppointmentsData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelEmployeeData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfoData;
@@ -42,10 +44,10 @@ public class EditBookingServiceActivity extends AppCompatActivity implements Vie
     ArrayList<String> slots;
     int totalTime = 0, totalCost = 0;
     ResponseModelAppointmentsData data = new ResponseModelAppointmentsData();
-    boolean isEdit;
     private ArrayList<String> bookedSlots = new ArrayList<>();
     private String bookingDate;
     private ArrayList<String> elapsedSlots;
+    private int reschedulePos;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,8 +63,7 @@ public class EditBookingServiceActivity extends AppCompatActivity implements Vie
 
     private void getData() {
 
-        isEdit = getIntent().getBooleanExtra("isEdit", false);
-
+        reschedulePos = getIntent().getIntExtra("pos", -1);
         data = getIntent().getParcelableExtra("data");
         if (data == null) {
             finish();
@@ -88,18 +89,15 @@ public class EditBookingServiceActivity extends AppCompatActivity implements Vie
         rateInfoDatas = new ArrayList<>();
         mAdapterServices = new ServicesAdapter(rateInfoDatas, new ArrayList<ResponseModelRateInfoData>(), R.layout.item_selected_service_list, true, this);
         rvServices.setAdapter(mAdapterServices);
-        bookingDate = Utility.getCurrentDate(Constants.displayDateFormat);
+
         slots = new ArrayList<>();
         ArrayList<String> selectedSlots = new ArrayList<>();
-        if (isEdit) {
-            selectedSlots.addAll(data.getSlots());
-            bookingDate = data.getBookingDate();
-        }
+        selectedSlots.addAll(data.getSlots());
+        bookingDate = data.getBookingDate();
         elapsedSlots = Utility.getElapsedSlots(this);
-
-        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, elapsedSlots, selectedSlots, bookedSlots, isEdit, bookingDate);
+        mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, elapsedSlots, selectedSlots, bookedSlots, true, bookingDate);
         rvSlots.setAdapter(mAdapterSlots);
-        tvMorning.performClick();
+        initSlotUi();
 
         ArrayList<ResponseModelEmployeeData> employeeDatas = Utility.getResponseModelEmployee(this, Constants.keySalonEmployeeData).getData();
         mAdapterStylist = new StylistAdapter(employeeDatas, this);
@@ -107,9 +105,41 @@ public class EditBookingServiceActivity extends AppCompatActivity implements Vie
 
         setServiceTotal(0, 0);
 
-        if (isEdit)
-            setData();
+        setData();
 
+    }
+
+    private void initSlotUi() {
+        String openTime = Utility.getPreferences(EditBookingServiceActivity.this, Constants.keySalonOpenTime);
+        ArrayList<String> morningSlots = Utility.getFormattedTimeSlots(openTime, Constants.timeStartAfternoon, Constants.displayDateFormatWithTime);
+
+        if (elapsedSlots.containsAll(morningSlots)) {
+
+            tvMorning.setTextColor(getResources().getColor(R.color.colorGrey));
+            tvMorning.setEnabled(false);
+
+            ArrayList<String> afternoonSlots = Utility.getFormattedTimeSlots(Constants.timeStartAfternoon, Constants.timeEndAfternoon, Constants.displayDateFormatWithTime);
+
+            if (elapsedSlots.containsAll(afternoonSlots)) {
+
+                tvAfternoon.setTextColor(getResources().getColor(R.color.colorGrey));
+                tvAfternoon.setEnabled(false);
+                String closeTime = Utility.getPreferences(EditBookingServiceActivity.this, Constants.keySalonCloseTime);
+                ArrayList<String> eveningSlots = Utility.getFormattedTimeSlots(Constants.timeEndAfternoon, closeTime, Constants.displayDateFormatWithTime);
+
+                if (elapsedSlots.containsAll(eveningSlots)) {
+                    tvEvening.setTextColor(getResources().getColor(R.color.colorGrey));
+                    tvEvening.setEnabled(false);
+                } else {
+                    tvEvening.performClick();
+                }
+            } else {
+                tvAfternoon.performClick();
+            }
+
+        } else {
+            tvMorning.performClick();
+        }
     }
 
     private void findViewById() {
@@ -206,10 +236,18 @@ public class EditBookingServiceActivity extends AppCompatActivity implements Vie
         if (isValidated()) {
             data.setTotalAmount("" + totalCost);
             data.setTotalTime("" + totalTime);
-            // data.setBookingDate();
             data.setServices(rateInfoDatas);
             data.setEmployee(mAdapterStylist.getSelectedStylistDataList());
             data.setSlots(mAdapterSlots.getSelectedSlotList());
+
+
+            ResponseModelAppointments responseModelAppointments = Utility.getResponseModelAppointments(EditBookingServiceActivity.this, Constants.keySalonAppointmentsData);
+
+            if (responseModelAppointments != null) {
+
+                responseModelAppointments.getData().set(reschedulePos, data);
+                Utility.addPreferencesAppointmentsData(EditBookingServiceActivity.this, Constants.keySalonAppointmentsData, responseModelAppointments);
+            }
 
 
             Intent intent = new Intent();

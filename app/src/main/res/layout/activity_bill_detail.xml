@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground">
@@ -90,13 +91,24 @@
                 android:textColor="@color/colorBlack"
                 android:textStyle="bold" />
 
-            <com.abhi.fabkutbusiness.Utils.ExpandedListView
+            <!-- <com.abhi.fabkutbusiness.Utils.ExpandedListView
+                 android:id="@+id/list_services_billing"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:divider="@null"
+                 android:scrollbars="none"
+                 android:visibility="visible" />-->
+
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/list_services_billing"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/colorWhite"
                 android:divider="@null"
-                android:scrollbars="none"
-                android:visibility="visible" />
+                android:orientation="vertical"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
 
             <TextView
                 android:id="@+id/tv_add_services"

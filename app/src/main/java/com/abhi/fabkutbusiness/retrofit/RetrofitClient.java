@@ -23,7 +23,7 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
-    public static final String BASE_URL = "http://www.fix91.in/fabkut/salon/";
+    public static final String BASE_URL = "http://www.fix91.in/fabkut/";
     public static final String BASE_Image_URL = "";
 
 

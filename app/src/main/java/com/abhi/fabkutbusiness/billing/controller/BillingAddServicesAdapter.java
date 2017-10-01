@@ -22,7 +22,7 @@ public class BillingAddServicesAdapter extends RecyclerView.Adapter<BillingAddSe
     private int selectedIndex = -1;
 
     public ResponseModelRateInfoData getSelectedService() {
-        if (selectedIndex > 0)
+        if (selectedIndex >= 0)
             return rateDataList.get(selectedIndex);
         else
             return null;

@@ -29,7 +29,6 @@ public class BillingServicesAdapter extends ArrayAdapter<ResponseModelRateInfoDa
     private static class ViewHolder {
         TextView tvName, tvOriginalPrice, tvEmployee, tvRemove, tvDiscountedPrice, tvDiscount;
 
-
     }
 
 

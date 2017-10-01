@@ -45,4 +45,5 @@ public class Constants {
     public static String displayDateFormat = "MMM dd, yyyy";
 
     public static String displayDateFormatWithTime = "MMM dd, yyyy/HH:mm";
+    public static String keySalonBillingListData = "keySalonBillingListData";
 }
