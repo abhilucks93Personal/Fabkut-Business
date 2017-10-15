@@ -63,6 +63,7 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
     ResponseModelAppointmentsData previousAppointmentData;
     int reschedulePos;
     boolean isEdit;
+    int activePosition = 0;
 
 
     @Override
@@ -116,7 +117,7 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, elapsedSlots, selectedSlots, bookedSlots, false, currentDate);
         rvSlots.setAdapter(mAdapterSlots);
 
-        initSlotUi();
+        initSlotUi(Utility.getCurrentDate("dd/MM/yyyy"));
 
         ArrayList<ResponseModelEmployeeData> employeeDatas = Utility.getResponseModelEmployee(this, Constants.keySalonEmployeeData).getData();
         mAdapterStylist = new StylistAdapter(employeeDatas, this);
@@ -127,35 +128,50 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private void initSlotUi() {
+    private void initSlotUi(String date) {
+
+        elapsedSlots = Utility.getElapsedSlots(this);
+
         String openTime = Utility.getPreferences(BookNowActivity.this, Constants.keySalonOpenTime);
-        ArrayList<String> morningSlots = Utility.getFormattedTimeSlots(openTime, Constants.timeStartAfternoon, Constants.displayDateFormatWithTime);
+        ArrayList<String> morningSlots = Utility.getFormattedTimeSlots(date, openTime, Constants.timeStartAfternoon, Constants.displayDateFormatWithTime);
 
         if (elapsedSlots.containsAll(morningSlots)) {
 
             tvMorning.setTextColor(getResources().getColor(R.color.colorGrey));
             tvMorning.setEnabled(false);
 
-            ArrayList<String> afternoonSlots = Utility.getFormattedTimeSlots(Constants.timeStartAfternoon, Constants.timeEndAfternoon, Constants.displayDateFormatWithTime);
+            ArrayList<String> afternoonSlots = Utility.getFormattedTimeSlots(date, Constants.timeStartAfternoon, Constants.timeEndAfternoon, Constants.displayDateFormatWithTime);
 
             if (elapsedSlots.containsAll(afternoonSlots)) {
 
                 tvAfternoon.setTextColor(getResources().getColor(R.color.colorGrey));
                 tvAfternoon.setEnabled(false);
                 String closeTime = Utility.getPreferences(BookNowActivity.this, Constants.keySalonCloseTime);
-                ArrayList<String> eveningSlots = Utility.getFormattedTimeSlots(Constants.timeEndAfternoon, closeTime, Constants.displayDateFormatWithTime);
+                ArrayList<String> eveningSlots = Utility.getFormattedTimeSlots(date, Constants.timeEndAfternoon, closeTime, Constants.displayDateFormatWithTime);
 
                 if (elapsedSlots.containsAll(eveningSlots)) {
                     tvEvening.setTextColor(getResources().getColor(R.color.colorGrey));
                     tvEvening.setEnabled(false);
                 } else {
+                    tvEvening.setEnabled(true);
+                    tvEvening.setTextColor(getResources().getColor(R.color.colorBlack));
                     tvEvening.performClick();
                 }
             } else {
+                tvAfternoon.setEnabled(true);
+                tvAfternoon.setTextColor(getResources().getColor(R.color.colorBlack));
+                tvEvening.setEnabled(true);
+                tvEvening.setTextColor(getResources().getColor(R.color.colorBlack));
                 tvAfternoon.performClick();
             }
 
         } else {
+            tvMorning.setEnabled(true);
+            tvMorning.setTextColor(getResources().getColor(R.color.colorBlack));
+            tvAfternoon.setEnabled(true);
+            tvAfternoon.setTextColor(getResources().getColor(R.color.colorBlack));
+            tvEvening.setEnabled(true);
+            tvEvening.setTextColor(getResources().getColor(R.color.colorBlack));
             tvMorning.performClick();
         }
     }
@@ -358,6 +374,8 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
                 String openTime = Utility.getPreferences(BookNowActivity.this, Constants.keySalonOpenTime);
                 slots.addAll(Utility.getTimeSlots(openTime, Constants.timeStartAfternoon));
                 mAdapterSlots.notifyDataSetChanged();
+                activePosition = Utility.getActiveSlotPosition(currentDate, elapsedSlots, slots);
+                rvSlots.scrollToPosition(activePosition);
                 break;
 
             case 1:
@@ -367,6 +385,8 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
                 tvEvening.setTextColor(getResources().getColor(R.color.colorBlack));
                 slots.addAll(Utility.getTimeSlots(Constants.timeStartAfternoon, Constants.timeEndAfternoon));
                 mAdapterSlots.notifyDataSetChanged();
+                activePosition = Utility.getActiveSlotPosition(currentDate, elapsedSlots, slots);
+                rvSlots.scrollToPosition(activePosition);
                 break;
 
             case 2:
@@ -377,6 +397,8 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
                 String closeTime = Utility.getPreferences(BookNowActivity.this, Constants.keySalonCloseTime);
                 slots.addAll(Utility.getTimeSlots(Constants.timeEndAfternoon, closeTime));
                 mAdapterSlots.notifyDataSetChanged();
+                activePosition = Utility.getActiveSlotPosition(currentDate, elapsedSlots, slots);
+                rvSlots.scrollToPosition(activePosition);
                 break;
 
         }
@@ -486,5 +508,7 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         currentDate = Utility.formatDateForDisplay(date, "MM-dd-yyyy", Constants.displayDateFormat);
         tvDate.setText(currentDate);
         mAdapterSlots.setDate(currentDate);
+        String formattedDate = Utility.formatDateForDisplay(date, "MM-dd-yyyy", "dd/MM/yyyy");
+        initSlotUi(formattedDate);
     }
 }

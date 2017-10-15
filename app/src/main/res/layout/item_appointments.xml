@@ -169,8 +169,9 @@
                 android:background="@color/colorWhite"
                 android:gravity="center"
                 android:padding="@dimen/_6sdp"
+                android:textStyle="bold"
                 android:text="Cancel Booking"
-                android:textColor="@color/colorGrey"
+                android:textColor="@color/colorRed"
                 android:textSize="@dimen/_10sdp" />
 
 
@@ -184,6 +185,7 @@
                 android:gravity="center"
                 android:padding="@dimen/_6sdp"
                 android:text="Reschedule"
+                android:textStyle="bold"
                 android:textColor="@color/colorOrange"
                 android:textSize="@dimen/_10sdp" />
 
@@ -196,6 +198,7 @@
                 android:gravity="center"
                 android:padding="@dimen/_6sdp"
                 android:text="Book Now"
+                android:textStyle="bold"
                 android:textColor="@color/colorGreen"
                 android:textSize="@dimen/_10sdp" />
 

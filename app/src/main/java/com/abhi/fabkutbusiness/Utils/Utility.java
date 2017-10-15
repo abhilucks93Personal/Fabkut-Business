@@ -95,11 +95,9 @@ public class Utility {
     public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public static boolean checkPermission(final Context context)
-    {
+    public static boolean checkPermission(final Context context) {
         int currentAPIVersion = Build.VERSION.SDK_INT;
-        if(currentAPIVersion>= Build.VERSION_CODES.M)
-        {
+        if (currentAPIVersion >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
@@ -135,6 +133,17 @@ public class Utility {
                 calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH));
         dialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+
+        dialog.show();
+    }
+
+    public static void datePickerDialogBackDate(Activity context, DatePickerDialog.OnDateSetListener listner) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+
+        DatePickerDialog dialog = new DatePickerDialog(context, listner,
+                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
+        dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
 
         dialog.show();
     }
@@ -1037,17 +1046,17 @@ public class Utility {
 
     }
 
-    public static ArrayList<String> getFormattedTimeSlots(String _openTime, String _closeTime, String format) {
-
+    public static ArrayList<String> getFormattedTimeSlots(String date, String _openTime, String _closeTime, String format) {
+        // "dd/MM/yyyy"
         ArrayList<String> slots = new ArrayList<>();
         try {
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-            String openTime = getCurrentDate("dd/MM/yyyy") + " " + _openTime.split("\\.")[0];
+            String openTime = date + " " + _openTime.split("\\.")[0];
             Date dateOpenTime = sdf.parse(openTime);
 
-            String closeTime = getCurrentDate("dd/MM/yyyy") + " " + _closeTime.split("\\.")[0];
+            String closeTime = date + " " + _closeTime.split("\\.")[0];
             Date dateCloseTime = sdf.parse(closeTime);
 
             long dif = dateOpenTime.getTime();
@@ -1727,12 +1736,11 @@ public class Utility {
 
     }
 
-    public static String getTotalSale(Activity activity) {
+    public static String getTotalSale(Activity activity, String currDate) {
 
         int strTotalSale = 0;
 
         ResponseModelBillingList _data = getResponseModelBillingListData(activity, Constants.keySalonBillingListData);
-        String currDate = getCurrentDate(Constants.displayDateFormat);
 
         if (_data.getDATA().containsKey(currDate)) {
             for (ResponseModelAppointmentsData data : _data.getDATA().get(currDate)) {
@@ -1745,19 +1753,28 @@ public class Utility {
 
     }
 
-    public static String getTotalService(Activity activity) {
+    public static String getTotalService(Activity activity, String currDate) {
 
         int strTotalService = 0;
 
         ResponseModelBillingList _data = getResponseModelBillingListData(activity, Constants.keySalonBillingListData);
-        String currDate = getCurrentDate(Constants.displayDateFormat);
 
         if (_data.getDATA().containsKey(currDate)) {
             strTotalService = _data.getDATA().get(currDate).size();
         }
 
-
         return "" + strTotalService;
 
+    }
+
+    public static int getActiveSlotPosition(String currentDate, ArrayList<String> elapsedSlots, ArrayList<String> slots) {
+        int index = 0;
+        for (String slot : slots) {
+            if (!elapsedSlots.contains(currentDate + "/" + slot)) {
+                break;
+            }
+            index++;
+        }
+        return index;
     }
 }

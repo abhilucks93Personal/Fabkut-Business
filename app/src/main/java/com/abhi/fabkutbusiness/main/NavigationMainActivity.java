@@ -56,7 +56,7 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
     ImageView ivAppointments;
     ListView listAppointments;
     ArrayList<ResponseModelAppointmentsData> appointmentsData = new ArrayList<>();
-    TextView tvAccounting, tvInventory,tvCrm;
+    TextView tvAccounting, tvInventory, tvCrm;
     private AppointmentsAdapter adapter;
     private ArrayList<ImageView> seatImageViews;
     private LinearLayout llSeats;
@@ -75,8 +75,8 @@ public class NavigationMainActivity extends AppCompatActivity implements View.On
 
         seatImageViews = Utility.refreshSeats(this, llSeats, seatImageViews);
 
-        tvTotalSale.setText(Utility.getTotalSale(NavigationMainActivity.this));
-        tvTotalServices.setText(Utility.getTotalService(NavigationMainActivity.this));
+        tvTotalSale.setText(Utility.getTotalSale(NavigationMainActivity.this, Utility.getCurrentDate(Constants.displayDateFormat)));
+        tvTotalServices.setText(Utility.getTotalService(NavigationMainActivity.this, Utility.getCurrentDate(Constants.displayDateFormat)));
 
         data.clear();
         data.addAll(Utility.getResponseModelCustomer(this, Constants.keySalonCustomerData).getData());

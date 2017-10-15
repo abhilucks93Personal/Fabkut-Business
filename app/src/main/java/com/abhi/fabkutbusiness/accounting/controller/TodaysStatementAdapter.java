@@ -1,4 +1,4 @@
-package com.abhi.fabkutbusiness.billing.controller;
+package com.abhi.fabkutbusiness.accounting.controller;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.abhi.fabkutbusiness.R;
@@ -19,15 +20,16 @@ import java.util.ArrayList;
  * Created by abhi on 21/05/17.
  */
 
-public class BillingAdapter extends ArrayAdapter<ResponseModelAppointmentsData> {
+public class TodaysStatementAdapter extends ArrayAdapter<ResponseModelAppointmentsData> {
     Context context;
 
     private static class ViewHolder {
-        TextView name, status, time, num, billNow, employee;
+        TextView name, status, time, num, billNow, employee, price;
+        LinearLayout llTotal;
 
     }
 
-    public BillingAdapter(Context context, ArrayList<ResponseModelAppointmentsData> billingDatas) {
+    public TodaysStatementAdapter(Context context, ArrayList<ResponseModelAppointmentsData> billingDatas) {
         super(context, R.layout.item_billing, billingDatas);
         this.context = context;
     }
@@ -45,7 +47,11 @@ public class BillingAdapter extends ArrayAdapter<ResponseModelAppointmentsData> 
             viewHolder.time = (TextView) convertView.findViewById(R.id.tv_time);
             viewHolder.num = (TextView) convertView.findViewById(R.id.tv_num);
             viewHolder.employee = (TextView) convertView.findViewById(R.id.tv_employee);
+            viewHolder.price = (TextView) convertView.findViewById(R.id.tv_price);
             viewHolder.billNow = (TextView) convertView.findViewById(R.id.tv_bill_now);
+            viewHolder.billNow.setText("Invoice");
+            viewHolder.llTotal = (LinearLayout) convertView.findViewById(R.id.ll_total);
+            viewHolder.llTotal.setVisibility(View.VISIBLE);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -58,14 +64,12 @@ public class BillingAdapter extends ArrayAdapter<ResponseModelAppointmentsData> 
         viewHolder.time.setText("" + Utility.getFormattedSlotTime(billingData.getSlots(), billingData.getBookingDate()) + " ");
         viewHolder.num.setText("" + billingData.getCustomerMobile() + " ");
         viewHolder.employee.setText("Employee : " + billingData.getEmployee().getEmp_name() + " ");
+        viewHolder.price.setText("Rs. " + billingData.getBillPayment().getPaid() + " ");
 
         viewHolder.billNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                getContext().startActivity(new Intent(getContext(), BillDetailActivity.class)
-                        .putExtra("data", billingData)
-                        .putExtra("pos", position));
             }
         });
 

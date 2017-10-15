@@ -8,6 +8,7 @@ import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import com.abhi.fabkutbusiness.accounting.view.ExpenseTrackerFragment;
+import com.abhi.fabkutbusiness.accounting.view.TodaysStatementFragment;
 import com.abhi.fabkutbusiness.main.BlankFragment;
 
 /**
@@ -41,7 +42,7 @@ public class AccountingPagerAdapter extends FragmentStatePagerAdapter {
 
             case 0:
 
-                return new ExpenseTrackerFragment();
+                return new TodaysStatementFragment();
 
             case 1:
 
@@ -49,7 +50,7 @@ public class AccountingPagerAdapter extends FragmentStatePagerAdapter {
 
             case 2:
 
-                return new BlankFragment();
+                return new ExpenseTrackerFragment();
 
             case 3:
 
@@ -70,13 +71,13 @@ public class AccountingPagerAdapter extends FragmentStatePagerAdapter {
         switch (position) {
 
             case 0:
-               return "Expense Tracker";
+               return "Todays Statement";
 
             case 1:
                 return "Advance Pay";
 
             case 2:
-                return "Todays Statement";
+                return "Expense Tracker";
 
             case 3:
                 return "Report";

@@ -97,7 +97,7 @@ public class EditBookingServiceActivity extends AppCompatActivity implements Vie
         elapsedSlots = Utility.getElapsedSlots(this);
         mAdapterSlots = new SlotAdapter(this, R.layout.item_slots, slots, elapsedSlots, selectedSlots, bookedSlots, true, bookingDate);
         rvSlots.setAdapter(mAdapterSlots);
-        initSlotUi();
+        initSlotUi(Utility.getCurrentDate("dd/MM/yyyy"));
 
         ArrayList<ResponseModelEmployeeData> employeeDatas = Utility.getResponseModelEmployee(this, Constants.keySalonEmployeeData).getData();
         mAdapterStylist = new StylistAdapter(employeeDatas, this);
@@ -109,23 +109,23 @@ public class EditBookingServiceActivity extends AppCompatActivity implements Vie
 
     }
 
-    private void initSlotUi() {
+    private void initSlotUi(String date) {
         String openTime = Utility.getPreferences(EditBookingServiceActivity.this, Constants.keySalonOpenTime);
-        ArrayList<String> morningSlots = Utility.getFormattedTimeSlots(openTime, Constants.timeStartAfternoon, Constants.displayDateFormatWithTime);
+        ArrayList<String> morningSlots = Utility.getFormattedTimeSlots(date, openTime, Constants.timeStartAfternoon, Constants.displayDateFormatWithTime);
 
         if (elapsedSlots.containsAll(morningSlots)) {
 
             tvMorning.setTextColor(getResources().getColor(R.color.colorGrey));
             tvMorning.setEnabled(false);
 
-            ArrayList<String> afternoonSlots = Utility.getFormattedTimeSlots(Constants.timeStartAfternoon, Constants.timeEndAfternoon, Constants.displayDateFormatWithTime);
+            ArrayList<String> afternoonSlots = Utility.getFormattedTimeSlots(date, Constants.timeStartAfternoon, Constants.timeEndAfternoon, Constants.displayDateFormatWithTime);
 
             if (elapsedSlots.containsAll(afternoonSlots)) {
 
                 tvAfternoon.setTextColor(getResources().getColor(R.color.colorGrey));
                 tvAfternoon.setEnabled(false);
                 String closeTime = Utility.getPreferences(EditBookingServiceActivity.this, Constants.keySalonCloseTime);
-                ArrayList<String> eveningSlots = Utility.getFormattedTimeSlots(Constants.timeEndAfternoon, closeTime, Constants.displayDateFormatWithTime);
+                ArrayList<String> eveningSlots = Utility.getFormattedTimeSlots(date, Constants.timeEndAfternoon, closeTime, Constants.displayDateFormatWithTime);
 
                 if (elapsedSlots.containsAll(eveningSlots)) {
                     tvEvening.setTextColor(getResources().getColor(R.color.colorGrey));

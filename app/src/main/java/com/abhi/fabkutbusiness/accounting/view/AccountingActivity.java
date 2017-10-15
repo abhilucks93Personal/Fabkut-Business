@@ -73,9 +73,9 @@ public class AccountingActivity extends AppCompatActivity implements View.OnClic
 
     private void initData() {
         //Adding the tabs using addTab() method
+        tabLayout.addTab(tabLayout.newTab().setText("TODAY'S STATEMENT"));
         tabLayout.addTab(tabLayout.newTab().setText("EXPENSE TRACKER"));
         tabLayout.addTab(tabLayout.newTab().setText("ADVANCE PAY"));
-        tabLayout.addTab(tabLayout.newTab().setText("TODAY'S STATEMENT"));
         tabLayout.addTab(tabLayout.newTab().setText("REPORT"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 

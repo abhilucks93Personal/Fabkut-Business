@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="@dimen/_10sdp">
+    android:padding="@dimen/_10sdp"
+    android:visibility="gone">
 
     <TextView
         android:layout_width="match_parent"
@@ -15,8 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="16/06/2017"
-        android:textColor="@color/colorDarkGrey"
-         />
+        android:textColor="@color/colorDarkGrey" />
 
     <RelativeLayout
         android:layout_width="match_parent"
