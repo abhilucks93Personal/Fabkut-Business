@@ -3,12 +3,16 @@ package com.abhi.fabkutbusiness.main.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by abhi on 23/07/17.
  */
 
 public class ResponseModelRateInfoData implements Parcelable {
 
+    @SerializedName("sub_service_id")
+    private String id;
     private String business_id;
     private String business_Name;
     private String sub_service_name;
@@ -17,6 +21,13 @@ public class ResponseModelRateInfoData implements Parcelable {
     private String rate;
     private String eta;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getBusiness_id() {
         return business_id;
@@ -79,6 +90,7 @@ public class ResponseModelRateInfoData implements Parcelable {
     }
 
     protected ResponseModelRateInfoData(Parcel in) {
+        id = in.readString();
         business_id = in.readString();
         business_Name = in.readString();
         sub_service_name = in.readString();
@@ -107,6 +119,7 @@ public class ResponseModelRateInfoData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
         dest.writeString(business_id);
         dest.writeString(business_Name);
         dest.writeString(sub_service_name);

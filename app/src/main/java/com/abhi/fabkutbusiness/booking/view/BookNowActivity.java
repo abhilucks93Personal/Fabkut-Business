@@ -30,6 +30,7 @@ import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelEmployeeData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfo;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfoData;
+import com.abhi.fabkutbusiness.retrofit.RetrofitApi;
 
 import java.util.ArrayList;
 
@@ -37,7 +38,7 @@ import java.util.ArrayList;
  * Created by abhi on 17/04/17.
  */
 
-public class BookNowActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class BookNowActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, RetrofitApi.ResponseListener {
 
     View actionBarView;
     TextView tvTitle;
@@ -64,6 +65,7 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
     int reschedulePos;
     boolean isEdit;
     int activePosition = 0;
+    private ResponseModelAppointments responseModelAppointments;
 
 
     @Override
@@ -253,6 +255,8 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
                     dataAppointment.setEmployee(mAdapterStylist.getSelectedStylistDataList());
                     dataAppointment.setSlots(mAdapterSlots.getSelectedSlotList());
 
+                    String businessId = Utility.getPreferences(BookNowActivity.this, Constants.keySalonBusinessId);
+                    dataAppointment.setBusinessId(businessId);
 
                     seatNum = String.valueOf(Utility.getAvailableSeat(BookNowActivity.this, dataAppointment.getSlots().get(0), dataAppointment.getSlots().get(dataAppointment.getSlots().size() - 1)));
                     dataAppointment.setSeatNumber(seatNum);
@@ -262,45 +266,14 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
                         rateData.setEmployee_id(dataAppointment.getEmployee().getEmp_id());
                     }
 
-                    ResponseModelAppointments responseModelAppointments = Utility.getResponseModelAppointments(BookNowActivity.this, Constants.keySalonAppointmentsData);
-
-                    // remove values
-                    if (isEdit) {
-                        Utility.releaseEmployeeSelectedSlots(this, previousAppointmentData.getEmployee().getEmp_id(), previousAppointmentData.getSlots());
-                        Utility.releaseSeatReschedule(this, previousAppointmentData.getSeatNumber(), previousAppointmentData.getSlots());
-
-                        if (responseModelAppointments != null) {
-                            if (reschedulePos >= 0) {
-                                responseModelAppointments.getData().remove(reschedulePos);
-                            }
-
-                        }
-                    }
-
-
+                    responseModelAppointments = Utility.getResponseModelAppointments(BookNowActivity.this, Constants.keySalonAppointmentsData);
+                    int assignBook = 1;
                     if (Utility.isCurrentBooking(mAdapterSlots.getSelectedSlotList().get(0))) {
-
-                        dataAppointment.setBookingStatus(Constants.BOOKING_STATUS_CONFIRM);
-
-                        Utility.bookSeat(BookNowActivity.this, dataAppointment);
-                        Utility.updateSeatSlots(BookNowActivity.this, dataAppointment.getSeatNumber(), dataAppointment.getSlots());
-
-                    } else {
-                        dataAppointment.setBookingStatus(Constants.BOOKING_STATUS_WAITING);
-
-                        if (responseModelAppointments != null) {
-                            responseModelAppointments.getData().add(dataAppointment);
-                        }
-
+                        assignBook = 0;
                     }
+                    RetrofitApi.getInstance().bookingApiMethod(this, this, dataAppointment, assignBook);
 
-                    Utility.addPreferencesAppointmentsData(BookNowActivity.this, Constants.keySalonAppointmentsData, responseModelAppointments);
 
-                    Utility.setEmployeeSelectedSlots(BookNowActivity.this, dataAppointment.getEmployee().getEmp_id(), dataAppointment.getSlots());
-
-                    Utility.updateSeatSlots(BookNowActivity.this, dataAppointment.getSeatNumber(), dataAppointment.getSlots());
-
-                    finish();
                 }
 
                 break;
@@ -325,6 +298,20 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.tv_date:
                 Utility.datePickerDialog(BookNowActivity.this, this);
                 break;
+
+        }
+    }
+
+
+    private void releaseEditData() {
+
+        Utility.releaseEmployeeSelectedSlots(this, previousAppointmentData.getEmployee().getEmp_id(), previousAppointmentData.getSlots());
+        Utility.releaseSeatReschedule(this, previousAppointmentData.getSeatNumber(), previousAppointmentData.getSlots());
+
+        if (responseModelAppointments != null) {
+            if (reschedulePos >= 0) {
+                responseModelAppointments.getData().remove(reschedulePos);
+            }
 
         }
     }
@@ -358,6 +345,34 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         return true;
+    }
+
+    private void saveData(ResponseModelAppointmentsData dataAppointment) {
+        ResponseModelAppointments responseModelAppointments = Utility.getResponseModelAppointments(BookNowActivity.this, Constants.keySalonAppointmentsData);
+
+        if (Utility.isCurrentBooking(mAdapterSlots.getSelectedSlotList().get(0))) {
+
+            dataAppointment.setBookingStatus(Constants.BOOKING_STATUS_CONFIRM);
+
+            Utility.bookSeat(BookNowActivity.this, dataAppointment);
+            Utility.updateSeatSlots(BookNowActivity.this, dataAppointment.getSeatNumber(), dataAppointment.getSlots());
+
+        } else {
+            dataAppointment.setBookingStatus(Constants.BOOKING_STATUS_WAITING);
+
+            if (responseModelAppointments != null) {
+                responseModelAppointments.getData().add(dataAppointment);
+            }
+
+        }
+
+        Utility.addPreferencesAppointmentsData(BookNowActivity.this, Constants.keySalonAppointmentsData, responseModelAppointments);
+
+        Utility.setEmployeeSelectedSlots(BookNowActivity.this, dataAppointment.getEmployee().getEmp_id(), dataAppointment.getSlots());
+
+        Utility.updateSeatSlots(BookNowActivity.this, dataAppointment.getSeatNumber(), dataAppointment.getSlots());
+
+        finish();
     }
 
 
@@ -510,5 +525,30 @@ public class BookNowActivity extends AppCompatActivity implements View.OnClickLi
         mAdapterSlots.setDate(currentDate);
         String formattedDate = Utility.formatDateForDisplay(date, "MM-dd-yyyy", "dd/MM/yyyy");
         initSlotUi(formattedDate);
+    }
+
+    @Override
+    public void _onCompleted() {
+
+    }
+
+    @Override
+    public void _onError(Throwable e) {
+
+    }
+
+    @Override
+    public void _onNext(Object obj) {
+        ResponseModelAppointmentsData data = (ResponseModelAppointmentsData) obj;
+        if (isEdit) {
+            releaseEditData();
+        }
+        data.setSync(true);
+        saveData(data);
+    }
+
+    @Override
+    public void _onNext1(Object obj) {
+
     }
 }

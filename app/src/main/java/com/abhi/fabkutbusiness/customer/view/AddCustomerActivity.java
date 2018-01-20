@@ -17,6 +17,7 @@ import com.abhi.fabkutbusiness.Utils.Utility;
 import com.abhi.fabkutbusiness.booking.view.BookNowActivity;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomer;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
+import com.abhi.fabkutbusiness.retrofit.RetrofitApi;
 
 import java.util.ArrayList;
 
@@ -24,7 +25,7 @@ import java.util.ArrayList;
  * Created by abhi on 17/04/17.
  */
 
-public class AddCustomerActivity extends AppCompatActivity implements View.OnClickListener {
+public class AddCustomerActivity extends AppCompatActivity implements View.OnClickListener, RetrofitApi.ResponseListener {
 
     View actionBarView;
     TextView tvTitle;
@@ -93,12 +94,12 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.tv_save:
-                saveData();
+                sendData();
                 break;
         }
     }
 
-    private void saveData() {
+    private void sendData() {
 
 
         String strFirstName = etFirstName.getText().toString().trim();
@@ -116,24 +117,11 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
         if (isValidated(strFirstName, strLastName, strEmail, strMobile, strAllergies, strGender)) {
 
 
-            ResponseModelCustomerData responseModelCustomerData = new ResponseModelCustomerData(businessId, businessName, strFirstName + " " + strLastName, "", strGender, strEmail, strMobile, strAllergies);
+            //RetrofitApi.getInstance().addCustomerApiMethod(this, this, businessId, businessName, strFirstName + " " + strLastName, strGender, strEmail, strMobile, strAllergies);
 
-            ResponseModelCustomer responseModelCustomer = Utility.getResponseModelCustomer(this, Constants.keySalonCustomerData);
+            ResponseModelCustomerData responseModelCustomerData = new ResponseModelCustomerData(businessId, businessName, strFirstName + " " + strLastName, "", strGender, strEmail, strMobile, strAllergies, "02/01/1993");
 
-            responseModelCustomer.getData().add(responseModelCustomerData);
-
-            Utility.addPreferencesCustomerData(this, Constants.keySalonCustomerData, responseModelCustomer);
-
-            String seatNum = Utility.getEmptySeatNum(this);
-
-            startActivity(new Intent(AddCustomerActivity.this, BookNowActivity.class)
-                    .putExtra("data", responseModelCustomerData)
-                    .putExtra("seatNum", seatNum));
-
-          /*  Intent intent = new Intent();
-            intent.putExtra("data", responseModelCustomerData);
-            setResult(RESULT_OK, intent);*/
-            finish();
+            RetrofitApi.getInstance().addCustomerApiMethod(this, this, responseModelCustomerData);
 
         }
     }
@@ -150,12 +138,57 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
             return false;
         }
 
-        if (strMobile.length() <10) {
+        if (strMobile.length() < 10) {
             Utility.showToast(this, "Please enter the valid Mobile number");
             return false;
         }
 
 
         return true;
+    }
+
+    private void saveData(ResponseModelCustomerData responseModelCustomerData) {
+
+
+        ResponseModelCustomer responseModelCustomer = Utility.getResponseModelCustomer(this, Constants.keySalonCustomerData);
+
+        responseModelCustomer.getData().add(responseModelCustomerData);
+
+        Utility.addPreferencesCustomerData(this, Constants.keySalonCustomerData, responseModelCustomer);
+
+        String seatNum = Utility.getEmptySeatNum(this);
+
+        startActivity(new Intent(AddCustomerActivity.this, BookNowActivity.class)
+                .putExtra("data", responseModelCustomerData)
+                .putExtra("seatNum", seatNum));
+
+
+        finish();
+    }
+
+    @Override
+    public void _onCompleted() {
+
+    }
+
+    @Override
+    public void _onError(Throwable e) {
+
+    }
+
+    @Override
+    public void _onNext(Object obj) {
+
+        ResponseModelCustomerData data = (ResponseModelCustomerData) obj;
+        data.setSync(true);
+
+        saveData(data);
+
+
+    }
+
+    @Override
+    public void _onNext1(Object obj) {
+
     }
 }

@@ -62,6 +62,8 @@ public class ResponseModelAppointmentsData implements Parcelable {
 
     private ArrayList<String> serviceTrackRecord;
 
+    private boolean isSync;
+
     public ResponseModelAppointmentsData() {
     }
 
@@ -88,8 +90,9 @@ public class ResponseModelAppointmentsData implements Parcelable {
         seatNumber = in.readString();
         services = in.createTypedArrayList(ResponseModelRateInfoData.CREATOR);
         slots = in.createStringArrayList();
-        serviceTrackRecord = in.createStringArrayList();
         employee = in.readParcelable(ResponseModelEmployeeData.class.getClassLoader());
+        serviceTrackRecord = in.createStringArrayList();
+        isSync = in.readByte() != 0;
     }
 
     @Override
@@ -115,8 +118,9 @@ public class ResponseModelAppointmentsData implements Parcelable {
         dest.writeString(seatNumber);
         dest.writeTypedList(services);
         dest.writeStringList(slots);
-        dest.writeStringList(serviceTrackRecord);
         dest.writeParcelable(employee, flags);
+        dest.writeStringList(serviceTrackRecord);
+        dest.writeByte((byte) (isSync ? 1 : 0));
     }
 
     @Override
@@ -332,5 +336,13 @@ public class ResponseModelAppointmentsData implements Parcelable {
 
     public void setServiceTrackRecord(ArrayList<String> serviceTrackRecord) {
         this.serviceTrackRecord = serviceTrackRecord;
+    }
+
+    public boolean isSync() {
+        return isSync;
+    }
+
+    public void setSync(boolean sync) {
+        isSync = sync;
     }
 }

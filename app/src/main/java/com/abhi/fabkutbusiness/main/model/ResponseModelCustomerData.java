@@ -25,8 +25,10 @@ public class ResponseModelCustomerData implements Serializable {
     private Integer previous_balance;
     private Long total_revenue;
     private Integer total_visits;
+    private String dob;
+    private boolean isSync;
 
-    public ResponseModelCustomerData(String business_id, String business_Name, String endUser_FirstName, String endUser_LastName, String gender, String email, String contact_no, String allergies) {
+    public ResponseModelCustomerData(String business_id, String business_Name, String endUser_FirstName, String endUser_LastName, String gender, String email, String contact_no, String allergies, String dob) {
         this.customerId = "" + System.currentTimeMillis();
         this.business_id = business_id;
         this.business_Name = business_Name;
@@ -39,6 +41,7 @@ public class ResponseModelCustomerData implements Serializable {
         this.previous_balance = 0;
         this.total_revenue = Long.valueOf(0);
         this.total_visits = 0;
+        this.dob = dob;
     }
 
     public ResponseModelCustomerData() {
@@ -179,5 +182,21 @@ public class ResponseModelCustomerData implements Serializable {
 
     public void setTotal_visits(Integer total_visits) {
         this.total_visits = total_visits;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    public boolean isSync() {
+        return isSync;
+    }
+
+    public void setSync(boolean sync) {
+        isSync = sync;
     }
 }

@@ -36,27 +36,48 @@ public interface AppRequestService {
     Observable<ResponseModelRateInfo> rateInfoApiMethod(@Query("business_id") String business_id);
 
 
-
     @POST("crm/index.php?tag=cstList")
-    Observable<ResponseCrmList>CrmListShowApiMethod(@Query("business_id") int business_id);
+    Observable<ResponseCrmList> CrmListShowApiMethod(@Query("business_id") int business_id);
 
     @POST("crm/index.php?tag=cstbasic")
-    Observable<ResponseBasicInfo>CrmBasicInfoShowApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int Enduser_id);
+    Observable<ResponseBasicInfo> CrmBasicInfoShowApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int Enduser_id);
 
     @POST("crm/index.php?tag=cstsocial")
-    Observable<ResponseSocialInfo>CrmSocialInfoShowApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int Enduser_id);
+    Observable<ResponseSocialInfo> CrmSocialInfoShowApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int Enduser_id);
 
     @POST("crm/index.php?tag=cstpersonal")
-    Observable<ResponsePersonalInfo>CrmPersonalInfoShowApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int Enduser_id);
+    Observable<ResponsePersonalInfo> CrmPersonalInfoShowApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int Enduser_id);
 
     @POST("crm/index.php?tag=cstbasicUP")
     Observable<ResponseBasicInfoUpdate> CrmBasicInfoUpdateApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int EndUser_id, @Query("enduser_name") String enduser_name, @Query("lname") String lname, @Query("gender") String gender, @Query("email") String email, @Query("contact_no") String contact_no, @Query("alternetContact") String alternetContact, @Query("allergies") String allergies, @Query("Profile_Comp_Basic") int Profile_Comp_Basic);
 
     @POST("crm/index.php?tag=cstPerUP")
-    Observable<ResponsePersonalInfoUpdate>CrmPersonalInfoUpdateApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int EndUser_id, @Query("dob") String dob, @Query("anidate") String anidate, @Query("m_um") int m_um, @Query("Profile_Comp_Personal") int Profile_Comp_Personal);
+    Observable<ResponsePersonalInfoUpdate> CrmPersonalInfoUpdateApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int EndUser_id, @Query("dob") String dob, @Query("anidate") String anidate, @Query("m_um") int m_um, @Query("Profile_Comp_Personal") int Profile_Comp_Personal);
 
     @POST("crm/index.php?tag=cstsocialUP")
-    Observable<ResponseSocialInfoUpdate> CrmSocialInfoUpdateApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int EndUser_id, @Query("Social_Home_address") String Social_Home_address, @Query("Social_Delivery_Address") String Social_Delivery_Address, @Query("Social_Mode_Commincation") String Social_Mode_Commincation , @Query("Social_FB_ID") String Social_FB_ID, @Query("Social_Twitter_ID") String Social_Twitter_ID, @Query("Social_whatsApp") String Social_whatsApp, @Query("Profile_Comp_Social") int Profile_Comp_Social );
+    Observable<ResponseSocialInfoUpdate> CrmSocialInfoUpdateApiMethod(@Query("business_id") int business_id, @Query("EndUser_id") int EndUser_id, @Query("Social_Home_address") String Social_Home_address, @Query("Social_Delivery_Address") String Social_Delivery_Address, @Query("Social_Mode_Commincation") String Social_Mode_Commincation, @Query("Social_FB_ID") String Social_FB_ID, @Query("Social_Twitter_ID") String Social_Twitter_ID, @Query("Social_whatsApp") String Social_whatsApp, @Query("Profile_Comp_Social") int Profile_Comp_Social);
+
+    @POST("booking/index.php?tag=syncuser1")
+    Observable<ResponseModel> addCustomerApiMethod(@Query("business_id") String business_id,
+                                                   @Query("enduser_name") String endUser_firstName,
+                                                   @Query("gender") String gender,
+                                                   @Query("email") String email,
+                                                   @Query("contact_no") String contact_no,
+                                                   @Query("allergies") String allergies,
+                                                   @Query("dob") String dob);
+
+    @POST("booking/index.php?tag=synBooking")
+    Observable<ResponseModel> bookingApiMethod(@Query("EnduserID") String EnduserID,
+                                               @Query("Salon_ID") String salonId,
+                                               @Query("TimeSlot") String timeSlot,
+                                               @Query("Empid") String employeeId,
+                                               @Query("Services") String services,
+                                               @Query("MobileNo") String customerMobile,
+                                               @Query("Remark") String remark,
+                                               @Query("PrevBooking") String prevBooking,
+                                               @Query("BookingDate") String bookingDate,
+                                               @Query("SeatNo") String seatNumber,
+                                               @Query("Assign_book") String assignBook);
 
 
 

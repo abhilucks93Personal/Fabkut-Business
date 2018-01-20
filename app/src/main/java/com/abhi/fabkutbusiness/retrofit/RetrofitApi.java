@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.widget.AdapterView;
 
+import com.abhi.fabkutbusiness.Utils.Constants;
+import com.abhi.fabkutbusiness.Utils.Utility;
 import com.abhi.fabkutbusiness.crm.model.ResponseBasicInfo;
 import com.abhi.fabkutbusiness.crm.model.ResponseBasicInfoUpdate;
 import com.abhi.fabkutbusiness.crm.model.ResponseCrmList;
@@ -12,14 +14,21 @@ import com.abhi.fabkutbusiness.crm.model.ResponsePersonalInfoUpdate;
 import com.abhi.fabkutbusiness.crm.model.ResponseSocialInfo;
 import com.abhi.fabkutbusiness.crm.model.ResponseSocialInfoUpdate;
 import com.abhi.fabkutbusiness.main.LoginActivity;
+import com.abhi.fabkutbusiness.main.model.ResponseModelAppointmentsData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelCustomer;
+import com.abhi.fabkutbusiness.main.model.ResponseModelCustomerData;
 import com.abhi.fabkutbusiness.main.model.ResponseModelEmployee;
 import com.abhi.fabkutbusiness.main.model.ResponseModelLogin;
 import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfo;
+import com.abhi.fabkutbusiness.main.model.ResponseModelRateInfoData;
+
+import java.util.ArrayList;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static com.abhi.fabkutbusiness.Utils.Constants.errorMsgWrong;
 
 /**
  * Created by abhishekagarwal on 3/21/17.
@@ -179,6 +188,119 @@ public class RetrofitApi {
 
                 });
 
+    }
+
+    public void addCustomerApiMethod(final Activity activity, final ResponseListener _mlistener_response, final ResponseModelCustomerData responseModelCustomerData) {
+        this.mlistener_response = _mlistener_response;
+        mProgressDialog = new ProgressDialog(activity);
+        mProgressDialog.setMessage("Uploading Data...");
+        mProgressDialog.show();
+
+
+        RetrofitClient.getClient().addCustomerApiMethod(responseModelCustomerData.getBusiness_id(),
+                responseModelCustomerData.getEndUser_FirstName(),
+                responseModelCustomerData.getGender(),
+                responseModelCustomerData.getEmail(),
+                responseModelCustomerData.getContact_no(),
+                responseModelCustomerData.getAllergies(),
+                responseModelCustomerData.getDob()
+        ).subscribeOn(Schedulers.newThread()).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<ResponseModel>() {
+                    @Override
+                    public void onCompleted() {
+                        mProgressDialog.dismiss();
+                        mlistener_response._onCompleted();
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mProgressDialog.dismiss();
+                        mlistener_response._onError(e);
+
+                    }
+
+                    @Override
+                    public void onNext(ResponseModel responseModel) {
+                        mProgressDialog.dismiss();
+                        if (responseModel.getSTATUS().equals("200")) {
+                            Utility.showToast(activity, "Customer added successfully");
+                            mlistener_response._onNext(responseModelCustomerData);
+                        } else
+                            Utility.showToast(activity, errorMsgWrong);
+
+
+                    }
+
+                });
+    }
+
+    public void bookingApiMethod(final Activity activity, final ResponseListener _mlistener_response, final ResponseModelAppointmentsData responseModelCustomerData, int assignBook) {
+        this.mlistener_response = _mlistener_response;
+        mProgressDialog = new ProgressDialog(activity);
+        mProgressDialog.setMessage("Uploading Data...");
+        mProgressDialog.show();
+
+        String slots[] = responseModelCustomerData.getSlots().get(0).split("/");
+        String slot = "";
+        if (slots.length == 2)
+            slot = slots[1];
+
+        RetrofitClient.getClient().bookingApiMethod(
+                responseModelCustomerData.getCustomerId(),
+                responseModelCustomerData.getBusinessId(),
+                slot,
+                responseModelCustomerData.getServices().get(0).getEmployee_id(),
+                getFormattedServicesIds(responseModelCustomerData.getServices()),
+                responseModelCustomerData.getCustomerMobile(),
+                "",
+                "0",
+                "",
+                responseModelCustomerData.getSeatNumber(),
+                "" + assignBook
+        ).subscribeOn(Schedulers.newThread()).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<ResponseModel>() {
+                    @Override
+                    public void onCompleted() {
+                        mProgressDialog.dismiss();
+                        mlistener_response._onCompleted();
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mProgressDialog.dismiss();
+                        mlistener_response._onError(e);
+
+                    }
+
+                    @Override
+                    public void onNext(ResponseModel responseModel) {
+                        mProgressDialog.dismiss();
+                        if (responseModel.getSTATUS().equals("200")) {
+                            Utility.showToast(activity, "Booking made successfully");
+                            mlistener_response._onNext(responseModelCustomerData);
+                        } else
+                            Utility.showToast(activity, errorMsgWrong);
+
+
+                    }
+
+                });
+    }
+
+    private String getFormattedServicesIds(ArrayList<ResponseModelRateInfoData> services) {
+        String serviceIds = "";
+        int index = 0;
+        for (ResponseModelRateInfoData modelRateInfoData : services) {
+            serviceIds += modelRateInfoData.getId();
+            if (index < (services.size() - 1))
+                serviceIds += ",";
+            index++;
+        }
+        return serviceIds;
     }
 
 
@@ -431,3 +553,8 @@ public class RetrofitApi {
 
 
 }
+
+
+
+
+
